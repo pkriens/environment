@@ -49,12 +49,12 @@ for zipfile in "$zips_dir"/*.zip; do
             csv_count=0
             while IFS= read -r -d '' csv_file; do
                 if [[ -f "$csv_file" ]]; then
-                    # Maak een veilige naam voor het CSV bestand (zonder spaties)
+                    # Gebruik gewoon de originele CSV naam (zonder zip naam prefix)
                     csv_basename=$(basename "$csv_file")
                     safe_csv_name=$(echo "$csv_basename" | tr ' ' '_' | tr -cd '[:alnum:]_.')
                     
-                    # Voeg zip naam prefix toe om unieke CSV namen te krijgen
-                    final_csv_name="${zip_name_no_ext}_${safe_csv_name}"
+                    # Gebruik alleen de CSV naam (geen zip prefix nodig)
+                    final_csv_name="${safe_csv_name}"
                     
                     # Kopieer CSV bestand
                     if cp "$csv_file" "${csvs_dir}/${final_csv_name}"; then

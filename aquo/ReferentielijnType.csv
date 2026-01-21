@@ -1,0 +1,9 @@
+Pagina,Id,Code,Omschrijving,Groep,Begin geldigheid,Gerelateerd
+Grenslijn waterstaatswerk - landzijde,8,GRENSWTSWLZD,Grenslijn waterstaatswerk - landzijde,,2016-03-12,grenslijn waterstaatswerk - landzijde
+Momentane duinvoetlijn,7,MOMTNDVLN,Momentane duinvoetlijn,,2016-03-12,duinvoetlijn
+Minimaal toelaatbare duinvoetlijn,6,MINTLBRDVLN,Minimaal toelaatbare duinvoetlijn,,2016-03-12,duinvoetlijn
+Momentane afslaglijn,5,MOMTNASLN,Momentane afslaglijn,,2016-03-12,afslaglijn
+Kritieke afslaglijn,4,KRITKASLN,Kritieke afslaglijn,,2016-03-12,afslaglijn
+Geen eenduidige referentielijn,3,GEENEDDGRFRT,Geen eenduidige referentielijn,,2016-03-12,referentielijn
+Middenkruinlijn (as),2,MIDDKLN,Middenkruinlijn (as),,2016-03-12,middenkruinlijn
+Buitenkruinlijn,1,BUITKLN,Buitenkruinlijn,,2016-03-12,buitenkruinlijn

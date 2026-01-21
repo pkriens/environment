@@ -1,0 +1,67 @@
+Pagina,Id,Code,Omschrijving,Groep,Begin geldigheid,Gerelateerd
+Maximum,9,MAX,Maximum,Statistiek,2011-06-11,maximum waarde
+Jaargemiddelde,8,JGM,Jaargemiddelde,Richtlijn/protocol,2011-06-11,
+Kriging methode,71,KGM,Kriging methode,Statistiek,2025-04-03,kriging methode
+Volkert-Bakker methode,70,VBM,Volkert-Bakker methode,Richtlijn/protocol,2023-08-18,Volkert-Bakker methode
+CUWVO 90 percentiel,7,C90,CUWVO 90 percentiel,Richtlijn/protocol,2011-06-11,x%-percentiel
+Voortschrijdend gemiddelde over 30 dagen,69,VGEM30D,Voortschrijdend gemiddelde over 30 dagen,Statistiek,2023-08-18,voortschrijdend gemiddelde
+Uurgemiddelde,68,GEMH,Uurgemiddelde,,2022-03-09,
+Decadegemiddelde,67,GEMDEC,Decadegemiddelde,,2022-03-09,
+Zes-uursgemiddelde,66,GEM6H,Zes-uursgemiddelde,,2022-03-09,
+Gemiddelde over 5 monsters,65,GEM5M,Gemiddelde over 5 monsters,,2022-03-09,
+Gemiddelde over 3 minuten,64,GEM3,Gemiddelde over 3 minuten,,2022-03-09,
+Etmaalgemiddelde,63,GEM24H,Etmaalgemiddelde,,2022-03-09,
+Gemiddelde over 20 monsters,62,GEM20M,Gemiddelde over 20 monsters,,2022-03-09,
+Gemiddelde over 10 monsters,61,GEM10M,Gemiddelde over 10 monsters,,2022-03-09,
+Ratio 60-Percentiel en 10-Percentiel,60,P60-P10,Ratio 60-Percentiel en 10-Percentiel,Percentielen,2017-12-12,x%-percentiel
+CUWVO 10 percentiel,6,C10,CUWVO 10 percentiel,Richtlijn/protocol,2011-06-11,x%-percentiel
+2.5-Percentiel,59,P02.5,2.5-Percentiel,Percentielen,2016-04-09,x%-percentiel
+97.5-Percentiel,58,P97.5,97.5-Percentiel,Percentielen,2016-04-09,x%-percentiel
+Modus,57,MODUS,Modus,Statistiek,2016-04-09,
+90-Percentiel zomerperiode,56,P90ZMR,90-Percentiel zomerperiode,Richtlijn/protocol,2014-09-06,x%-percentiel
+Laagste waarde gedurende een zomerhalfjaar,55,ZHJMIN,Laagste waarde gedurende een zomerhalfjaar,Richtlijn/protocol,2014-09-04,
+Hoogste waarde gedurende een zomerhalfjaar,54,ZHJMAX,Hoogste waarde gedurende een zomerhalfjaar,Richtlijn/protocol,2014-09-04,
+Niet van toepassing,5,NVT,Niet van toepassing,(technisch),2011-06-11,
+Zomerhalfjaar ionenconcentratie,49,ZPH,Zomerhalfjaar ionenconcentratie,Richtlijn/protocol,2011-06-11,
+Zomerhalfjaar doorzicht,48,ZHM,Zomerhalfjaar doorzicht,Richtlijn/protocol,2011-06-11,
+Zomergemiddelde,46,ZGM,Zomergemiddelde,Richtlijn/protocol,2011-06-11,zomergemiddelde
+Wintergemiddelde,45,WGM,Wintergemiddelde,Richtlijn/protocol,2011-06-11,wintergemiddelde
+Variantie,44,VAR,Variantie,Statistiek,2011-06-11,variantievariantie
+Standaarddeviatie,43,STD,Standaarddeviatie,Statistiek,2011-06-11,
+Sommatie waarden deelparameters boven bepalingsgrens,42,S10,Sommatie waarden deelparameters boven bepalingsgrens,Sommatie deelparameters,2011-06-11,sommatie waarden deelparameters boven bepalingsgrens
+Sommatie waarden deelparameters (factor 0.7 als onder bepg),41,S07,Sommatie waarden deelparameters (factor 0.7 als onder bepg),Sommatie deelparameters,2011-06-11,
+99-Percentiel,40,P99,99-Percentiel,Percentielen,2011-06-11,x%-percentiel
+Sommatie waarden,4,SOM,Sommatie waarden,Sommatie deelparameters,2011-06-11,sommatie waarden
+98-Percentiel van de maximale dagwaarde,39,P98MAX,98-Percentiel van de maximale dagwaarde,Richtlijn/protocol,2011-06-11,x%-percentiel
+98-Percentiel,38,P98,98-Percentiel,Percentielen,2011-06-11,x%-percentiel
+97-Percentiel,37,P97,97-Percentiel,Percentielen,2011-06-11,x%-percentiel
+96-Percentiel,36,P96,96-Percentiel,Percentielen,2011-06-11,x%-percentiel
+95 percentiel volgens Zwemwaterrichtlijn 2006,35,P95ZWR,95 percentiel volgens Zwemwaterrichtlijn 2006,Percentielen,2012-12-08,x%-percentiel
+95-Percentiel,34,P95,95-Percentiel,Percentielen,2011-06-11,x%-percentiel
+90 percentiel volgens Zwemwaterrichtlijn 2006,33,P90ZWR,90 percentiel volgens Zwemwaterrichtlijn 2006,Percentielen,2012-12-08,x%-percentiel
+90-Percentiel,32,P90,90-Percentiel,Percentielen,2011-06-11,x%-percentiel
+85-Percentiel,31,P85,85-Percentiel,Percentielen,2011-06-11,x%-percentiel
+80-Percentiel,30,P80,80-Percentiel,Percentielen,2011-06-11,x%-percentiel
+Gestandaardiseerde waarde,3,GSD,Gestandaardiseerde waarde,Richtlijn/protocol,2011-06-11,gestandaardiseerde waarde
+75-Percentiel,29,P75,75-Percentiel,Percentielen,2011-06-11,x%-percentiel
+70-Percentiel,28,P70,70-Percentiel,Percentielen,2011-06-11,x%-percentiel
+67-Percentiel,27,P67,67-Percentiel,Percentielen,2011-06-11,x%-percentiel
+65-Percentiel,26,P65,65-Percentiel,Percentielen,2011-06-11,x%-percentiel
+60-Percentiel,25,P60,60-Percentiel,Percentielen,2011-06-11,x%-percentiel
+55-Percentiel,24,P55,55-Percentiel,Percentielen,2011-06-11,x%-percentiel
+45-Percentiel,23,P45,45-Percentiel,Percentielen,2011-06-11,x%-percentiel
+40-Percentiel,22,P40,40-Percentiel,Percentielen,2011-06-11,x%-percentiel
+35-Percentiel,21,P35,35-Percentiel,Percentielen,2011-06-11,x%-percentiel
+30-Percentiel,20,P30,30-Percentiel,Percentielen,2011-06-11,x%-percentiel
+Gemiddelde,2,GEM,Gemiddelde,Statistiek,2011-06-11,gemiddelde
+25-Percentiel,19,P25,25-Percentiel,Percentielen,2011-06-11,x%-percentiel
+20-Percentiel,18,P20,20-Percentiel,Percentielen,2011-06-11,x%-percentiel
+15-Percentiel,17,P15,15-Percentiel,Percentielen,2011-06-11,x%-percentiel
+10-Percentiel,16,P10,10-Percentiel,Percentielen,2011-06-11,x%-percentiel
+5-Percentiel,15,P05,5-Percentiel,Percentielen,2011-06-11,x%-percentiel
+Aantal meetwaarden,14,NUM,Aantal meetwaarden,Statistiek,2011-06-11,
+Aantal meetwaarden onder minimum detectiegrens,13,NON,Aantal meetwaarden onder minimum detectiegrens,Statistiek,2011-06-11,
+Aantal meetwaarden boven maximum detectiegrens,12,NBO,Aantal meetwaarden boven maximum detectiegrens,Statistiek,2011-06-11,
+Minimum,11,MIN,Minimum,Statistiek,2011-06-11,minimum waarde
+50-Percentiel (mediaan),10,MED,50-Percentiel (mediaan),Percentielen,2011-06-11,x%-percentiel
+Berekend,1,BER,Berekend,Methodiek,2011-06-11,berekende waarde

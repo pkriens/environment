@@ -1,0 +1,5 @@
+Pagina,Id,Omschrijving,Toelichting,Begin geldigheid,Gerelateerd
+WaardeReeksDiepte,4,WaardeReeksDiepte,De reeks met waarnemingen verschilt in diepte. De RangeResult.diffVar moet van het type: DepthResult zijn.,2015-11-19,
+WaardeReeksTijd,3,WaardeReeksTijd,De reeks met waarnemingen verschilt in tijd. De RangeResult.diffVar moet van het type: TimeResult zijn.,2015-11-19,
+WaardeReeksPlaatsTijd,2,WaardeReeksPlaatsTijd,De reeks met waarnemingen verschilt in plaats en tijd. De RangeResult.diffVar moet van het type: LocationResult en TimeResult zijn.,2015-11-19,
+WaardeReeksPlaats,1,WaardeReeksPlaats,De reeks met waarnemingen verschilt in plaats. De RangeResult.diffVar moet van het type: LocationResult zijn.,2015-11-19,

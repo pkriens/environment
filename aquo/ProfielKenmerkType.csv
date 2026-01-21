@@ -1,0 +1,20 @@
+Pagina,Id,Code,Omschrijving,Groep,Begin geldigheid,Gerelateerd
+Verdichting binnenzijde,9,9,Verdichting binnenzijde,Reliëf,2016-03-12,
+Verdichting buitenzijde,8,8,Verdichting buitenzijde,Reliëf,2016-03-12,
+Kruin berm (binnen),7,7,Kruin berm (binnen),Reliëf,2016-03-12,
+Kruin berm (buiten),6,6,Kruin berm (buiten),Reliëf,2016-03-12,
+Teen binnenzijde,5,5,Teen binnenzijde,Reliëf,2016-03-12,binnenteen
+Teen buitenzijde,4,4,Teen buitenzijde,Reliëf,2016-03-12,buitenteen
+Kruin binnenzijde,3,3,Kruin binnenzijde,Reliëf,2016-03-12,
+Kruin buitenzijde,2,2,Kruin buitenzijde,Reliëf,2016-03-12,
+Rand verkeersbelasting (binnenwaarts),19,19,Rand verkeersbelasting (binnenwaarts),Referentie,2016-03-12,
+Rand verkeersbelasting (buitenwaarts),18,18,Rand verkeersbelasting (buitenwaarts),Referentie,2016-03-12,
+Insteek sloot (polder zijde),17,17,Insteek sloot (polder zijde),Reliëf,2016-03-12,
+Waterbodem (polder zijde),16,16,Waterbodem (polder zijde),Reliëf,2016-03-12,waterbodem
+Waterbodem (waterkering zijde),15,15,Waterbodem (waterkering zijde),Reliëf,2016-03-12,waterbodem
+Insteek sloot (waterkering zijde),14,14,Insteek sloot (waterkering zijde),Reliëf,2016-03-12,
+Insteek berm binnenzijde,13,13,Insteek berm binnenzijde,Reliëf,2016-03-12,
+Insteek berm buitenzijde,12,12,Insteek berm buitenzijde,Reliëf,2016-03-12,
+Insteek sloot,11,11,Insteek sloot,Reliëf,2016-03-12,
+Waterlijn,10,10,Waterlijn,Referentie,2016-03-12,waterlijn
+Kruin midden,1,1,Kruin midden,Referentie,2016-03-12,

@@ -1,0 +1,69 @@
+Pagina,Id,Code,Omschrijving,Groep,Begin geldigheid,Gerelateerd
+Sluis,9,18,Sluis,Waterstaatkundig werk,2016-03-08,sluis
+Sifon,8,17,Sifon,Waterstaatkundig werk,2016-03-08,sifon
+Lokstroomgemaal,70,70,Lokstroomgemaal,Gemaal,2023-07-20,lokstroomgemaal
+Rioolwaterzuiveringsinstallatie,7,16,Rioolwaterzuiveringsinstallatie,Zuiveringtechnisch werk,2016-03-08,rioolwaterzuiveringsinstallatie
+Ultrasooninstallatie,69,69,Ultrasooninstallatie,Verbeterinstallatie,2022-12-03,ultrasooninstallatie
+Menginstallatie,68,68,Menginstallatie,Verbeterinstallatie,2022-12-03,menginstallatie
+Luchtmenginstallatie,67,67,Luchtmenginstallatie,Verbeterinstallatie,2022-12-03,luchtmenginstallatie
+Defosfateringsinstallatie,66,66,Defosfateringsinstallatie,Verbeterinstallatie,2022-12-03,defosfateringsinstallatie
+Zandvang,63,65,Zandvang,Waterstaatkundig werk,2016-11-22,zandvang
+Dijknol,62,9,Dijknol,Waterstaatkundig werk,2016-03-08,dijknol
+Coupure,61,8,Coupure,Waterstaatkundig werk,2016-03-08,coupure
+Bodemval,60,7,Bodemval,Waterstaatkundig werk,2016-03-08,bodemval
+Rioleringselement,6,15,Rioleringselement,Zuiveringtechnisch werk,2016-03-08,rioleringselement
+Vistrap,59,64,Vistrap,Vispassage,2016-03-08,vistrap
+Vissluis,58,63,Vissluis,Vispassage,2016-03-08,vissluis
+Vislift,57,62,Vislift,Vispassage,2016-03-08,vislift
+Deniltrap,56,61,Deniltrap,Vispassage,2016-03-08,deniltrap
+Bekkentrap,55,60,Bekkentrap,Vispassage,2016-03-08,bekkentrap
+Bellenscherm,54,6,Bellenscherm,Verbeterinstallatie,2022-12-03,bellenscherm
+Aalpijp,53,59,Aalpijp,Vispassage,2016-03-08,aalpijp
+Tuimel- of kantelstuw,52,58,Tuimel- of kantelstuw,Stuw,2016-03-08,
+Trommelstuw,51,57,Trommelstuw,Stuw,2016-03-08,
+Stuwbak,50,56,Stuwbak,Stuw,2016-03-08,stuwbak
+Hevel,5,13,Hevel,Waterstaatkundig werk,2016-03-08,hevel
+Stuw met contragewicht,49,55,Stuw met contragewicht,Stuw,2016-03-08,
+Segmentstuw,48,54,Segmentstuw,Stuw,2016-03-08,
+Schuifstuw,47,53,Schuifstuw,Stuw,2016-03-08,
+Schotbalkstuw,46,52,Schotbalkstuw,Stuw,2016-03-08,
+Overlaat,45,51,Overlaat,Stuw,2016-03-08,overlaat
+Meetstuw,44,50,Meetstuw,Stuw,2016-03-08,meetstuw
+Aquaduct,43,5,Aquaduct,Overbrugging,2016-03-08,aquaduct
+Meetschot,42,49,Meetschot,Stuw,2016-03-08,meetschot
+Knijpstuw,41,48,Knijpstuw,Stuw,2016-03-08,
+Klepstuw,40,47,Klepstuw,Stuw,2016-03-08,
+Gemaal,4,12,Gemaal,Waterstaatkundig werk,2016-03-08,gemaal
+Inlaat- en/of aflaatstuw,39,46,Inlaat- en/of aflaatstuw,Stuw,2016-03-08,
+Hevelstuw,38,45,Hevelstuw,Stuw,2016-03-08,
+Gronddamstuw,37,44,Gronddamstuw,Stuw,2016-03-08,
+Drijverstuw,36,43,Drijverstuw,Stuw,2016-03-08,
+Conserveringstuw,35,42,Conserveringstuw,Stuw,2016-03-08,
+Cascadestuw,34,41,Cascadestuw,Stuw,2016-03-08,
+Brievenbusstuw,33,40,Brievenbusstuw,Stuw,2016-03-08,brievenbusstuw
+Balgstuw,32,39,Balgstuw,Stuw,2016-03-08,balgstuw
+Uitwateringssluis/spuisluis,31,38,Uitwateringssluis/spuisluis,Sluis,2016-03-08,uitwateringssluis
+Schutsluis,30,37,Schutsluis,Sluis,2016-03-08,schutsluis
+Duiker,3,11,Duiker,Waterstaatkundig werk,2016-03-08,duikerduiker
+Keersluis,29,36,Keersluis,Sluis,2016-03-08,keersluis
+Inlaatsluis,28,35,Inlaatsluis,Sluis,2016-03-08,inlaatsluis
+Damsluis,27,34,Damsluis,Sluis,2016-03-08,damsluis
+Rolbrug,26,33,Rolbrug,Brug,2016-03-08,rolbrug
+Rolbasculebrug,25,32,Rolbasculebrug,Brug,2016-03-08,
+Pontondraaibrug,24,31,Pontondraaibrug,Brug,2016-03-08,pontondraaibrug
+Pontonbrug,23,30,Pontonbrug,Brug,2016-03-08,pontonbrug
+Tunnel,22,3,Tunnel,Tunnel,2016-03-08,tunnel
+Ophaalbrug,21,29,Ophaalbrug,Brug,2016-03-08,ophaalbrug
+Klapbrug,20,28,Klapbrug,Brug,2016-03-08,klapbrug
+Doorlaatwerk,2,10,Doorlaatwerk,Waterstaatkundig werk,2016-03-08,doorlaatwerk
+Hefbrug,19,27,Hefbrug,Brug,2016-03-08,hefbrug
+Draaibrug,18,26,Draaibrug,Brug,2016-03-08,draaibrug
+Basculebrug,17,25,Basculebrug,Brug,2016-03-08,
+Waterkrachtcentrale,16,24,Waterkrachtcentrale,Waterstaatkundig werk,2016-03-08,
+Hoofden,15,23,Hoofden,Overbrugging,2016-03-08,
+Voorde,14,22,Voorde,Waterstaatkundig werk,2016-03-08,voorde
+Vispassage,13,21,Vispassage,Waterstaatkundig werk,2016-03-08,vispassage
+Vaste dam,12,20,Vaste dam,Waterstaatkundig werk,2016-03-08,vaste dam
+Overkluizing,11,2,Overkluizing,Overbrugging,2016-03-08,overkluizing
+Stuw,10,19,Stuw,Waterstaatkundig werk,2016-03-08,stuw
+Brug,1,1,Brug,Overbrugging,2016-03-08,brug

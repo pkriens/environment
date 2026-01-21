@@ -1,0 +1,69 @@
+Pagina,Id,Code,Omschrijving,Groep,Cijfercode,Begin geldigheid,Gerelateerd
+Onbekend,99,ON,Onbekend,Medium,199,2020-10-09,
+Chemische hulpstoffen,9,CH,Chemische hulpstoffen,Medium,90,2011-06-10,chemicaliën
+Bouwstof,8,BF,Bouwstof,MilieuCompartiment,109,2025-11-26,
+Aquatische Zone,69,AQ,Aquatische Zone,Biotoop,148,2025-11-26,aquatische zone
+Amfibische Zone,68,AM,Amfibische Zone,Biotoop,147,2025-11-26,amfibische zone
+Terrestrische zone,67,TZ,Terrestrische zone,Biotoop,146,2024-04-19,terrestrische zone
+Fecale uitwerpselen,66,FU,Fecale uitwerpselen,Medium,145,2024-02-02,
+Brak water,65,BK,Brak water,Medium,144,2023-12-15,
+Vispaaiplaats,64,VP,Vispaaiplaats,Biotoop,143,2022-07-28,vispaaiplaats
+Diepe submerse zone,63,XZ,Diepe submerse zone,Biotoop,142,2022-06-29,diepe submerse zone
+Digestaat,62,DT,Digestaat,Medium,141,2022-05-19,digestaat
+Afgekrabde verf,61,AV,Afgekrabde verf,Medium,140,2021-10-13,
+IJs,60,YS,IJs,Medium,139,2020-10-09,ijs
+Koelwater,59,KL,Koelwater,Medium,138,2020-10-09,koelwater
+Vaste stof,58,VF,Vaste stof,Medium,137,2020-10-09,
+Proceswater,57,PC,Proceswater,Medium,136,2020-10-09,proceswater
+Dialysewater,56,DA,Dialysewater,Medium,135,2020-10-09,dialysewater
+Bronwater,55,BN,Bronwater,Medium,134,2020-10-09,bronwater
+Wortelzone,54,WZ,Wortelzone,Biotoop,133,2019-11-12,wortelzone
+Onverzadigde zone,53,OZ,Onverzadigde zone,Biotoop,132,2019-11-12,onverzadigde zone
+Duin,52,DN,Duin,Biotoop,131,2019-09-27,duin
+Gas,51,GS,Gas,Medium,130,2019-02-01,
+Bedrijfswater,50,BW,Bedrijfswater,Medium,129,2018-12-08,bedrijfswater
+Slib,5,SB,Slib,MilieuCompartiment,112,2025-11-26,slib
+Hypolimnion,49,HY,Hypolimnion,Biotoop,128,2019-09-27,hypolimnion
+Metalimnion,48,MN,Metalimnion,Biotoop,127,2019-09-27,metalimnion
+Epilimnion,47,EN,Epilimnion,Biotoop,126,2019-09-27,epilimnion
+Limnische zone,46,LZ,Limnische zone,Biotoop,125,2019-09-27,limnische zone
+Oppervlaktewater en Oever,45,OO,Oppervlaktewater en Oever,Biotoop,124,2017-11-14,
+Constructiemateriaal,44,CM,Constructiemateriaal,Medium,123,2016-09-24,constructiemateriaal
+Granulaat,43,GT,Granulaat,Medium,122,2016-09-24,granulaat
+Oppervlak,42,OK,Oppervlak,Medium,121,2016-09-24,oppervlak
+Teeltsubstraat,41,TS,Teeltsubstraat,Medium,120,2016-09-24,teeltsubstraat
+Afval,40,AL,Afval,Medium,119,2016-09-24,afval
+Oppervlaktewater,4,OW,Oppervlaktewater,MilieuCompartiment,10,2025-11-26,oppervlaktewater
+Stof (Lucht),39,SD,Stof (Lucht),MilieuCompartiment,118,2025-11-26,stof (lucht)
+Bodemverbeteraar,38,BR,Bodemverbeteraar,Medium,117,2016-09-24,bodemverbeteraar
+Asfalt,37,AT,Asfalt,MilieuCompartiment,116,2025-11-26,asfalt
+Zeewater,36,ZR,Zeewater,Medium,115,2016-09-24,
+Olie,35,OL,Olie,Medium,114,2016-09-24,
+Eluaat,34,ET,Eluaat,Medium,113,2016-09-24,eluaat
+Submerse zone,33,SZ,Submerse zone,Biotoop,111,2014-06-28,submerse zone
+Emerse zone,32,EZ,Emerse zone,Biotoop,110,2014-06-28,emerse zone
+Zwembadwater,31,ZW,Zwembadwater,Medium,108,2011-06-10,zwembadwater
+Zwevende stof,30,ZS,Zwevende stof,MilieuCompartiment,50,2025-11-26,
+Afvalwater,3,AW,Afvalwater,Medium,30,2011-06-10,afvalwater
+Zand,29,ZD,Zand,Medium,43,2011-06-10,zand
+Zuiveringsslib,28,ZB,Zuiveringsslib,Medium,55,2011-06-10,zuiveringsslib
+Vegetatie,27,VE,Vegetatie,Medium,65,2011-06-10,vegetatie
+Talud,26,TD,Talud,Biotoop,106,2011-06-10,talud
+Siliconenrubber,25,SR,Siliconenrubber,Biotoop,105,2011-06-10,
+Steen,24,SN,Steen,Biotoop,71,2011-06-10,steen
+Poriewater,23,PW,Poriewater,MilieuCompartiment,20,2025-11-26,interstitieel water
+Profundaal,22,PM,Profundaal,Biotoop,86,2011-06-10,profundaal (zoet)
+Oever,21,OR,Oever,Biotoop,100,2011-06-10,oever
+Onderhoudspad (maaipad),20,OP,Onderhoudspad (maaipad),Biotoop,107,2011-06-10,onderhoudspad
+Grondwater,2,GW,Grondwater,MilieuCompartiment,15,2025-11-26,grondwater
+Organisme (biota),19,OE,Organisme (biota),(technisch),60,2011-06-10,organisme
+Niet van toepassing,18,NT,Niet van toepassing,(technisch),99,2011-06-10,
+Lozingswater,17,LW,Lozingswater,Medium,31,2011-06-10,
+Lucht,16,LT,Lucht,MilieuCompartiment,80,2025-11-26,lucht
+Litoraal,15,LM,Litoraal,Biotoop,85,2011-06-10,litoraal
+Kunstmatig substraat,14,KS,Kunstmatig substraat,Biotoop,73,2011-06-10,kunstmatig substraat
+Klinkhout,13,KH,Klinkhout,Biotoop,72,2011-06-10,klinkhout
+Hemelwater,12,HW,Hemelwater,MilieuCompartiment,35,2025-11-26,hemelwater
+Drinkwater,11,DW,Drinkwater,Medium,18,2011-06-10,drinkwater
+Drijflaag,10,DL,Drijflaag,Medium,103,2011-06-10,drijflaagdrijflaag
+Bodem/Sediment,1,BS,Bodem/Sediment,MilieuCompartiment,40,2025-11-26,bodemsediment

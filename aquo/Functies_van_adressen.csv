@@ -1,0 +1,11 @@
+Pagina,Id,Code,Omschrijving,Afkorting,Begin geldigheid,Gerelateerd
+vestigingsadres,9,V,vestigingsadres,V,2011-08-30,
+sociale dienstadres,8,S,sociale dienstadres,S,2011-08-30,
+postadres,7,P,postadres,P,2011-08-30,
+locatieadres (klacht/melding of meetlocatie),6,L,locatieadres (klacht/melding of meetlocatie),L,2011-08-30,klacht/melding voorval
+kadastraal perceel adres,5,K,kadastraal perceel adres,K,2011-08-30,
+incassoadres,4,I,incassoadres,I,2011-08-30,
+heffingsobject adres,3,H,heffingsobject adres,H,2011-08-30,
+correspondentie-adres,2,C,correspondentie-adres,C,2011-08-30,
+woonadres,10,W,woonadres,W,2011-08-30,
+briefadres of afwijkend adres,1,B,briefadres of afwijkend adres,B,2011-08-30,

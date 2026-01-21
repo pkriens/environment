@@ -1,0 +1,24 @@
+Pagina,Id,Code,Omschrijving,Groep,Begin geldigheid,Gerelateerd
+Aanvoergebied,9,9,Aanvoergebied,Aan- en afvoergebied,2011-10-12,aanvoergebied
+Afwateringsgebied,8,8,Afwateringsgebied,Aan- en afvoergebied,2011-10-12,afwateringsgebied
+Afwateringseenheid,7,7,Afwateringseenheid,Aan- en afvoergebied,2011-10-12,afwateringseenheid
+Schaarstegebied,6,6,Schaarstegebied,Aan- en afvoergebied,2011-10-12,schaarstegebied
+Peilgebied,5,5,Peilgebied,Aan- en afvoergebied,2011-10-12,peilgebied
+Hellend gebied,4,4,Hellend gebied,Aan- en afvoergebied,2011-10-12,
+Onderbemalingsgebied,3,3,Onderbemalingsgebied,Aan- en afvoergebied,2011-10-12,
+Deelafvoergebied,23,70,Deelafvoergebied,Aan- en afvoergebied,2011-10-12,
+Afvoergebied,22,60,Afvoergebied,Aan- en afvoergebied,2011-10-12,afvoergebied
+Ecologisch analysegebied,21,51,Ecologisch analysegebied,Overig,2011-12-24,Ecologisch analysegebied
+RWSR gebied,20,50,RWSR gebied,Overig,2011-10-12,
+Poldergebied,2,2,Poldergebied,Aan- en afvoergebied,2011-10-12,poldergebied
+Rapportage-eenheid binnen deelstroomgebied,19,45,Rapportage-eenheid binnen deelstroomgebied,Stroomgebied,2011-10-12,
+Deelstroomgebied,18,40,Deelstroomgebied,Stroomgebied,2011-10-12,deelstroomgebied
+Stroomgebied,17,30,Stroomgebied,Stroomgebied,2011-10-12,stroomgebied
+Deelgebied,16,20,Deelgebied,Stroomgebied,2011-10-12,
+Deelstroomgebiedsdistrict,15,15,Deelstroomgebiedsdistrict,Stroomgebied,2025-11-26,
+Aan- en afvoer peilgebied,14,14,Aan- en afvoer peilgebied,Aan- en afvoergebied,2011-10-12,
+Afvoer peilgebied,13,13,Afvoer peilgebied,Aan- en afvoergebied,2011-10-12,
+Aanvoer peilgebied,12,12,Aanvoer peilgebied,Aan- en afvoergebied,2011-10-12,
+Bemalingsgebied,11,11,Bemalingsgebied,Aan- en afvoergebied,2011-10-12,bemalinggebied
+Stroomgebiedsdistrict,10,10,Stroomgebiedsdistrict,Stroomgebied,2025-11-26,stroomgebieddistrict
+Boezemgebied,1,1,Boezemgebied,Aan- en afvoergebied,2011-10-12,af-/aanvoergebied

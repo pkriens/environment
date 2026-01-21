@@ -1,0 +1,24 @@
+Pagina,Id,Code,Omschrijving,Groep,Begin geldigheid,Gerelateerd
+Geur,9,GEUR,Geur,immetingen,2018-06-19,
+Hoeveelheid voorgepompt water,8,HOEVHVGPWTR,Hoeveelheid voorgepompt water,immetingen,2018-06-19,
+Zinklaag,7,ZINKLG,Zinklaag,immetingen,2018-06-19,zinklaag
+Belucht,6,BELT,Belucht,immetingen,2018-06-19,
+Filterkous,5,FILTKS,Filterkous,immetingen,2018-06-19,
+Leeggezogen,4,LEEGGZGN,Leeggezogen,immetingen,2018-06-19,
+Gespoeld,3,GESD,Gespoeld,immetingen,2018-06-19,
+Totaal gewogen asbestverdacht materiaal > 20 mm,23,TOTGAMGD20MM,Totaal gewogen asbestverdacht materiaal > 20 mm,,2024-05-31,totaal gewogen asbestverdacht materiaal > 20 mm
+Totaal gewogen schoon residu > 20 mm,22,TOTGSRGD20MM,Totaal gewogen schoon residu > 20 mm,,2024-05-31,totaal gewogen schoon residu > 20 mm
+Totaal gewogen asbestverdacht materiaal < 20 mm,21,TOTGAMKD20MM,Totaal gewogen asbestverdacht materiaal < 20 mm,,2024-05-31,totaal gewogen asbestverdacht materiaal < 20 mm
+Slang hergebruikt,20,SLANGHGBT,Slang hergebruikt,immetingen,2019-10-30,
+Hoeveelheid werkwater,2,HOEVHWWTR,Hoeveelheid werkwater,immetingen,2018-06-19,
+Temperatuur water moeilijk te bepalen,19,TEMPRTWTMLTB,Temperatuur water moeilijk te bepalen,immetingen,2019-10-30,
+Grondwaterstand teveel gedaald,18,GRONDWTSTVGD,Grondwaterstand teveel gedaald,immetingen,2019-10-30,
+Inline filter afwijkend,17,INLFTAWKD,Inline filter afwijkend,immetingen,2019-10-30,
+Contaminatie door verbrandingsmotor,16,CONTMNTDVBDM,Contaminatie door verbrandingsmotor,immetingen,2019-10-30,
+Afwijking in meetapparatuur,15,AFWKIMAPRTR,Afwijking in meetapparatuur,immetingen,2019-10-30,
+Afwijkend gekoeld,14,AFWKGKD,Afwijkend gekoeld,immetingen,2019-10-30,
+Drijflaag aanwezig,13,DRIJFLAWZG,Drijflaag aanwezig,immetingen,2018-06-19,
+Kleursterkte,12,KLEURSTE,Kleursterkte,immetingen,2018-06-19,
+Bijkleur,11,BIJKR,Bijkleur,immetingen,2018-06-19,
+Hoofdkleur,10,HOOFDKR,Hoofdkleur,immetingen,2018-06-19,
+Doorstroming peilbuis,1,DOORSMPBS,Doorstroming peilbuis,immetingen,2018-06-19,

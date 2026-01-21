@@ -1,0 +1,79 @@
+Pagina,Id,Code,Omschrijving,Groep,Begin geldigheid,Gerelateerd
+Radiolog,9,204,Radiolog,Plaatsbepalingsapparaat,2016-01-05,
+Afstandkijker,8,203,Afstandkijker,Plaatsbepalingsapparaat,2016-01-05,
+Ferrybox,78,160,Ferrybox,Overig,2025-02-21,ferrybox
+Video,77,159,Video,Overig,2016-11-05,
+Spectro-radiometer,76,158,Spectro-radiometer,Waterkwaliteit,2016-07-09,
+Waterpasinstrument,75,120,Waterpasinstrument,Niveaumeting,2016-01-04,
+Slaggaard / Peilstok,74,119,Slaggaard / Peilstok,Niveaumeting,2016-01-04,slaggaard
+Singlebeam echolood - laag frequent,73,118,Singlebeam echolood - laag frequent,Niveaumeting,2025-11-28,
+Singlebeam echolood - hoog frequent,72,117,Singlebeam echolood - hoog frequent,Niveaumeting,2025-11-28,
+Schuifmaat,71,116,Schuifmaat,Overig,2016-01-04,
+Multibeam echolood,70,115,Multibeam echolood,Niveaumeting,2025-11-28,multibeam echolood
+Duimstok,7,111,Duimstok,Overig,2016-01-05,
+LiDar - Laserhoogtemeter,69,114,LiDar - Laserhoogtemeter,Niveaumeting,2025-11-28,
+Laser,68,113,Laser,Niveaumeting,2016-01-04,
+Handlood,67,112,Handlood,Niveaumeting,2016-01-04,
+Handmatig,66,110,Handmatig,Overig,2016-01-04,
+Golfmeetboei,65,108,Golfmeetboei,Waterkwantiteit,2016-01-04,waverider
+Fototoestel,64,107,Fototoestel,Overig,2016-01-04,
+Troebelheidsmeter,63,106,Troebelheidsmeter,Waterkwaliteit,2016-01-04,
+Secchi schijf,62,105,Secchi schijf,Waterkwaliteit,2025-11-28,
+Lichtintensiteitsmeter,61,104,Lichtintensiteitsmeter,Waterkwaliteit,2016-01-04,
+Digitaliseer apparaat,60,103,Digitaliseer apparaat,Overig,2016-01-04,
+Akoestische afstandsmeter,6,201,Akoestische afstandsmeter,Plaatsbepalingsapparaat,2016-01-05,
+Debietmeter,59,102,Debietmeter,Waterkwantiteit,2016-01-04,debietmeter
+Centrifuge,58,101,Centrifuge,Waterkwaliteit,2016-01-04,centrifuge
+Elektrische capaciteitsmeter,57,157,Elektrische capaciteitsmeter,Niveaumeting,2013-07-20,
+Stroomsnelheidsmeter,56,156,Stroomsnelheidsmeter,Waterkwantiteit,2012-09-06,
+Druksensor,55,155,Druksensor,Niveaumeting,2012-06-05,sensor
+Geleidendheid- en temperatuursensor,54,154,Geleidendheid- en temperatuursensor,Waterkwaliteit,2012-06-05,sensor
+Temperatuursensor,53,153,Temperatuursensor,Waterkwaliteit,2025-11-28,sensor
+Zichtmeter,52,152,Zichtmeter,Meteorologie,2012-05-15,
+Wolkenmeter,51,151,Wolkenmeter,Meteorologie,2012-05-15,
+Windsnelheidsmeter,50,150,Windsnelheidsmeter,Meteorologie,2012-05-15,anemometer
+Geografische kaart,5,220,Geografische kaart,Plaatsbepalingsapparaat,2016-01-05,kaart
+Windrichtingmeter,49,149,Windrichtingmeter,Meteorologie,2012-05-15,
+Zuurstofmeter,48,148,Zuurstofmeter,Waterkwaliteit,2012-05-15,
+Titratiemeter,47,147,Titratiemeter,Waterkwaliteit,2012-05-15,
+Saliniteitmeter,46,146,Saliniteitmeter,Waterkwaliteit,2012-05-15,
+pH meter,45,145,pH meter,Waterkwaliteit,2025-11-28,
+Grondwater(monster) sonde,44,144,Grondwater(monster) sonde,Waterkwaliteit,2012-05-15,
+Geluidssnelheidsmeter,43,143,Geluidssnelheidsmeter,Waterkwaliteit,2012-05-15,
+Geleidendheidmeter,42,142,Geleidendheidmeter,Waterkwaliteit,2012-05-15,geleidendheidsmeter
+Fluorescentiemeter,41,141,Fluorescentiemeter,Waterkwaliteit,2012-05-15,
+Verrekijker,40,140,Verrekijker,Overig,2012-05-15,verrekijker
+Tachymeter,4,216,Tachymeter,Plaatsbepalingsapparaat,2016-01-05,
+Thermograaf,39,139,Thermograaf,Overig,2012-05-15,
+Kwikthermometer,38,138,Kwikthermometer,Overig,2012-05-15,
+Propellor,37,137,Propellor,Waterkwantiteit,2012-05-15,
+HF-Radar,36,136,HF-Radar,Waterkwantiteit,2012-05-15,
+Elektromagnetische sensor,35,135,Elektromagnetische sensor,Waterkwantiteit,2020-09-04,sensor
+Akoestisch Doppler (ADCP),34,134,Akoestisch Doppler (ADCP),Waterkwantiteit,2012-05-15,acoustic doppler current profiler
+Stralingsmeter,33,133,Stralingsmeter,Waterkwaliteit,2012-05-15,
+Standopnemer,32,132,Standopnemer,Overig,2012-05-15,standopnemer
+Hellinghoekmeter,31,131,Hellinghoekmeter,Overig,2012-05-15,
+Gyrokompas,30,130,Gyrokompas,Overig,2012-05-15,gyrokompas
+RTK/LRK DGPS,3,219,RTK/LRK DGPS,Plaatsbepalingsapparaat,2016-01-05,
+Tipping bucket,29,129,Tipping bucket,Meteorologie,2012-05-15,
+Pluviograaf,28,128,Pluviograaf,Meteorologie,2025-11-28,
+Vlotter,27,127,Vlotter,Niveaumeting,2012-05-15,
+Ultrasoon,26,126,Ultrasoon,Niveaumeting,2012-05-15,ultrasoon
+Stappenbaak,25,125,Stappenbaak,Niveaumeting,2012-05-15,stappenbaak
+Peilschaal,24,124,Peilschaal,Niveaumeting,2012-05-15,peilschaal
+MERIS instrument ENVISAT,23,123,MERIS instrument ENVISAT,Meteorologie,2012-05-15,
+Hygrometer,22,122,Hygrometer,Meteorologie,2012-05-15,
+Barometer,21,121,Barometer,Meteorologie,2012-05-15,barometer
+Radar,20,109,Radar,Overig,2016-01-05,
+DGPS,2,217,DGPS,Plaatsbepalingsapparaat,2016-01-05,
+Total Station,19,214,Total Station,Plaatsbepalingsapparaat,2016-01-05,
+Theodoliet,18,213,Theodoliet,Plaatsbepalingsapparaat,2016-01-05,
+Sextant,17,212,Sextant,Plaatsbepalingsapparaat,2016-01-05,sextant
+Decca,16,211,Decca,Plaatsbepalingsapparaat,2016-01-05,decca
+Trident,15,210,Trident,Plaatsbepalingsapparaat,2016-01-05,
+Hyperfix,14,209,Hyperfix,Plaatsbepalingsapparaat,2016-01-05,
+Trisponder,13,208,Trisponder,Plaatsbepalingsapparaat,2016-01-05,
+Hi-Fix,12,207,Hi-Fix,Plaatsbepalingsapparaat,2016-01-05,
+Meetband,11,206,Meetband,Plaatsbepalingsapparaat,2016-01-05,
+Afstandsdraad,10,205,Afstandsdraad,Plaatsbepalingsapparaat,2016-01-05,
+GPS,1,218,GPS,Plaatsbepalingsapparaat,2016-01-05,

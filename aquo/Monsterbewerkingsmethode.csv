@@ -1,0 +1,31 @@
+Pagina,Id,Code,Omschrijving,Groep,Titel,Begin geldigheid,Gerelateerd
+Qiagen DNeasy PowerWater kit,967,QDPWk,Qiagen DNeasy PowerWater kit,Voorschrift water,Methode voor de isolatie van genomisch DNA uit gefilterde watermonsters,2025-08-29,Qiagen DNeasy PowerWater Kit
+Qiagen Dneasy PowerBiofilm kit,966,QDPBk,Qiagen Dneasy PowerBiofilm kit,Voorschrift water,"Methode voor de isolatie van hoogwaardig, puur DNA uit biofilmmonsters",2025-08-29,Qiagen Dneasy PowerBiofilm Kit
+Fenol chloroform extractie,965,FolCHCl3ext,Fenol chloroform extractie,Voorschrift water,Methode die nucleinezuren scheidt van eiwitten en lipiden,2025-08-29,Fenol chloroform extractie
+Qiagen DNeasy Blood & Tissue kit,964,QDBTk,Qiagen DNeasy Blood & Tissue kit,Voorschrift water,"Methode voor extractie van totaal DNA uit gisten, bacterien en virussen of uit dierlijk bloed, weefsels en cellen",2025-08-29,Qiagen DNeasy Blood & Tissue Kit
+CMA/5/B.1 november 2019,963,CMA5B1.19,CMA/5/B.1 november 2019,Norm bodem,Monstervoorbehandeling. Meststof-bodemverbeterend middel,2021-11-12,
+Leidraad voor passive sampling 2012,962,LEIDDPS:2012,Leidraad voor passive sampling 2012,Voorschrift water,Leidraad voor de passive sampling van hydrofobe stoffen in water met siliconenrubber samplers,2014-11-08,
+NEN-EN-ISO 5667-3:2012 en,961,I5667-3.12,NEN-EN-ISO 5667-3:2012 en,Norm water,Water - Monsterneming - Deel 3: Richtlijn voor de conservering en behandeling van watermonsters,2014-11-08,
+NVN 6517:2007 nl,352,V6517.07,NVN 6517:2007 nl,Norm water,"Water - Tellen, determineren en biovolumebepaling van zoöplankton (Cladocera, Copepoda, Rotifera) > 50 µm en het bepalen van de groottestructuur van Daphnia",2011-06-14,
+UVR bijlage 1,351,UVR-bijl1,UVR bijlage 1,Voorschrift water,"Uitvoeringsbesluit rijkswateren (UVR) bijlage I - Voorschriften voor meting, bemonstering, analyse en berekening",2011-06-14,
+SIKB-protocol 3001,350,SIKB-3001,SIKB-protocol 3001,Voorschrift bodem,SIKB-protocol 3001 - Conserveringsmethoden en conserveringstermijnen voor milieumonsters,2011-06-14,
+SIKB-protocol 2003,349,SIKB-2003,SIKB-protocol 2003,Voorschrift bodem,SIKB-protocol 2003 - Veldwerk bij milieuhygiënisch waterbodemonderzoek,2013-04-18,
+RWSV - 913.00.W004,348,RWSV-W004,RWSV - 913.00.W004,Voorschrift water,Rijkswaterstaat standaard voorschrift - Conservering en behandeling van monsters oppervlaktewater voor fysisch en chemisch onderzoek,2011-06-14,
+NEN 6464:1981 nl,347,N6464.81,NEN 6464:1981 nl,Norm water,Water - Monstervoorbehandeling van slib of slibhoudend water voor de bepaling van elementen van atomaire-absorptiespectrometrie - Ontsluiting met salpeterzuur en zwavelzuur,2011-06-14,
+NEN 5768:1992 nl,346,N5768.92,NEN 5768:1992 nl,Norm bodem,Bodem - Monstervoorbehandeling van grond voor de bepaling van elementen met atomaire spectrometrie - Ontsluiting met salpeterzuur en zwavelzuur,2011-06-14,
+NEN 5719:1999 nl,345,N5719.99,NEN 5719:1999 nl,Norm bodem,Bodem - Voorbehandeling van waterbodemmonsters,2011-06-14,
+NEN 5625: 2007 nl,344,N5625.07,NEN 5625: 2007 nl,Norm water,Radioactiviteitsmetingen - Monsterneming en monsterconservering van water en daarin onopgeloste stoffen,2011-06-14,
+NEN-EN 15708:2007 en,343,N15708.07,NEN-EN 15708:2007 en,Norm water,"Water - Richtlijn voor de inventarisatie, bemonstering en laboratorium analyse van fytobenthos in ondiep stromend water",2011-06-14,
+NEN-EN 15204:2006 en,342,N15204.06,NEN-EN 15204:2006 en,Norm water,Kwaliteit van water - Richtlijn voor het tellen van fytoplankton met behulp van omgekeerde microscopie (Utermöhl-techniek),2011-06-14,
+NEN-EN 15196:2006 en,341,N15196.06,NEN-EN 15196:2006 en,Norm water,Water - Richtlijn voor bemonstering en behandeling van pupal exuviae van de Chironomidae (orde Diptera) voor ecologische beoordeling,2011-06-14,
+NEN-EN 14671:2006 en,340,N14671.06,NEN-EN 14671:2006 en,Norm slib,Karakterisering van slib - Voorbehandeling voor de bepaling van ammoniakstikstof met gebruik van 2 mol/l kaliumchloride,2011-06-14,
+NEN-EN 14407:2004 en,339,N14407.04,NEN-EN 14407:2004 en,Norm water,"Water - Richtlijn voor de determinatie, telling en interpretatie van monsters van benthische diatomeeën uit stromend water",2011-06-14,
+NEN-EN 13946:2003 en,338,N13946.03,NEN-EN 13946:2003 en,Norm water,Waterkwaliteit - Richtlijn voor de routinematige bemonstering en monstervoorbehandeling van benthische diatomeeën in rivieren,2011-06-14,
+NEN-EN 13657:2002 en,337,N13657.02,NEN-EN 13657:2002 en,Norm slib,Karakterisering van afval - Ontsluiting voor de bepaling van in koningswater oplosbare elementen,2011-06-14,
+NEN-EN 13656:2002 en,336,N13656.02,NEN-EN 13656:2002 en,Norm slib,"Karakterisering van afval - Microgolfontsluiting met waterstoffluoride (HF), salpeterzuur (HNO3) en zoutzuur(HCI)mengsels voor de bepaling van elementen in afval",2011-06-14,
+NEN-EN-ISO 5667-3:2004 en,335,I5667-3.04,NEN-EN-ISO 5667-3:2004 en,Norm vervallen,Water - Monsterneming - Deel 3: Richtlijn voor de conservering en behandeling van watermonsters,2014-11-08,
+ISO 5667-15:1999 en,334,I5667-15.99,ISO 5667-15:1999 en,Norm water/slib,Water - Monsterneming - Deel 15: Richtlijn voor conservering en behandeling van slib en sedimentmonsters,2011-06-14,
+ISO 5667-14:1998 en,333,I5667-14.98,ISO 5667-14:1998 en,Norm water,Water - Monsterneming - Deel 14: Richtlijn voor de kwaliteitsborging van monsterneming en -behandeling van water dat wordt gebruikt voor milieuonderzoek,2011-06-14,
+NEN-ISO 23893-1:2007 en,332,I23893-1.07,NEN-ISO 23893-1:2007 en,Norm water,"Water - Biochemische en fysiologische bepalingen aan vis - Deel 1: Monsterneming van vis, behandeling en conservering van monsters",2011-06-14,
+NEN-EN-ISO 19458:2007 en,331,I19458.07,NEN-EN-ISO 19458:2007 en,Norm water,Water - Monsterneming voor microbiologisch onderzoek,2011-06-14,
+NEN-EN-ISO 16665:2005 en,330,I16665.05,NEN-EN-ISO 16665:2005 en,Norm water,Water - Richtlijnen voor kwantitatieve bemonstering en monsterbehandeling van macro-invertebraten in marien zacht substraat,2011-06-14,
