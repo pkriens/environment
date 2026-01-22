@@ -11,26 +11,27 @@ from lxml import html
 from urllib.parse import urlparse, parse_qs
 import argparse
 
+
 class Aquo:
-    def __init__(self, verbose=False):
-        self.base_url = "https://www.aquo.nl"
+    
+    def __init__(self, verbose=False, category_url="https://www.aquo.nl/index.php/Categorie:Actueel"):
+        self.errors = False
         self.verbose = verbose
+        self.category_url = category_url
         self.session = requests.Session()
         self.session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
         })
     
     def info(self, message):
-        """Print info message if verbose mode is enabled"""
         if self.verbose:
             print(message,file=sys.stderr)
     
     def error(self, message):
-        """Print error message to stderr"""
+        self.errors = True
         print(message, file=sys.stderr)
 
     def extract_items_from_page(self, url):
-        """Extract items from page."""
         try:
             response = self.session.get(url)
             response.raise_for_status()
@@ -77,72 +78,137 @@ class Aquo:
             return []
 
     def extract_table_from_id_page(self, url):
-        """Extract table data from an Id page."""
         try:
             response = self.session.get(url)
             response.raise_for_status()
             
             tree = html.fromstring(response.content)
             
-            # Find the table with class="datatable" (dynamic tables)
-            tables = tree.xpath('//table[@class="datatable"]')
-            if not tables:
-                # Try to find regular table with class="table" (static tables)
-                tables = tree.xpath('//table[@class="table"]')
-                if not tables:
-                    self.error("No datatable or regular table found on page")
-                    return []
+            # Check for "overige resultaten" link using xpath
+            more_results_links = tree.xpath('//a[contains(text(), "overige resultaten")]')
+            if more_results_links:
+                href = more_results_links[0].get('href')
+                if href:
+                    more_url = self.resolve_relative_url(href)
+                    
+                    self.info(f"Found 'overige resultaten' link: {more_url}")
+                    
+                    # Get the "more results" page
+                    more_response = self.session.get(more_url)
+                    more_response.raise_for_status()
+                    more_tree = html.fromstring(more_response.content)
+                    
+                    # Look for 500 items link using xpath
+                    limit_500_links = more_tree.xpath('//a[contains(@href, "limit=500")]')
+                    if limit_500_links:
+                        base_href = limit_500_links[0].get('href')
+                        if base_href:
+                            # Get all data by fetching in batches of 500
+                            self.info("Fetching data in batches of 500...")
+                            all_rows = []
+                            offset = 0
+                            batch_size = 500
+                            
+                            while True:
+                                # Construct URL for this batch
+                                batch_href = base_href.replace('limit=500', f'limit={batch_size}')
+                                # Update offset
+                                import re
+                                if 'offset=' in batch_href:
+                                    batch_href = re.sub(r'offset=\d+', f'offset={offset}', batch_href)
+                                else:
+                                    batch_href += f'&offset={offset}'
+                                
+                                batch_url = self.resolve_relative_url(batch_href)
+                                
+                                self.info(f"Fetching batch {offset//batch_size + 1}: offset={offset}, limit={batch_size}")
+                                
+                                # Get this batch
+                                batch_response = self.session.get(batch_url)
+                                batch_response.raise_for_status()
+                                batch_tree = html.fromstring(batch_response.content)
+                                
+                                # Extract rows from this batch
+                                batch_rows = self._extract_table_from_page(batch_tree)
+                                
+                                if not batch_rows:
+                                    # No more data
+                                    self.info(f"No more data found at offset {offset}. Total rows collected: {len(all_rows)}")
+                                    break
+                                
+                                all_rows.extend(batch_rows)
+                                self.info(f"Collected {len(batch_rows)} rows in this batch, total so far: {len(all_rows)}")
+                                
+                                # Check if we got less than expected (indicating we're at the end)
+                                if len(batch_rows) < batch_size:
+                                    self.info(f"Last batch returned {len(batch_rows)} rows (less than {batch_size}), stopping pagination")
+                                    break
+                                
+                                offset += batch_size
+                            
+                            # Return all collected rows
+                            return all_rows
             
-            table = tables[0]
-            
-            # Extract header row
-            headers = []
-            header_cells = table.xpath('.//thead//th | .//tbody//tr[1]//th | .//tr[1]//th')
-            for cell in header_cells:
-                header_text = cell.text_content().strip()
-                if header_text:
-                    headers.append(header_text)
-            
-            # If no headers found in thead/tbody, get them from first row
-            if not headers:
-                first_row_cells = table.xpath('.//tbody//tr[1]//td | .//tr[1]//td')
-                for i, cell in enumerate(first_row_cells):
-                    headers.append(f"Column_{i+1}")
-            
-            # Extract data rows - skip header rows and footer rows
-            rows = []
-            data_rows = table.xpath('.//tbody//tr[not(contains(@class, "smwfooter"))] | .//tr[position()>1 and not(contains(@class, "smwfooter"))]')
-            
-            for row in data_rows:
-                cells = row.xpath('.//td')
-                if cells:  # Skip empty rows
-                    row_data = {}
-                    for i, cell in enumerate(cells):
-                        if i < len(headers):
-                            # Get text content, handling links
-                            text_content = cell.text_content().strip()
-                            row_data[headers[i]] = text_content
-                    if row_data:  # Only add non-empty rows
-                        rows.append(row_data)
-            
-            return rows
+            # If no "overige resultaten" link, extract from current page
+            return self._extract_table_from_page(tree)
             
         except Exception as e:
             self.error(f"Error extracting table from {url}: {e}")
             return []
+    
+    def _extract_table_from_page(self, tree):
+        tables = tree.xpath('//table[@class="datatable"]')
+        if not tables:
+            # Try to find regular table with class="table" (static tables)
+            tables = tree.xpath('//table[@class="table"]')
+            if not tables:
+                return []
+        
+        table = tables[0]
+        
+        # Extract header row
+        headers = []
+        header_cells = table.xpath('.//thead//th | .//tbody//tr[1]//th | .//tr[1]//th')
+        for cell in header_cells:
+            header_text = cell.text_content().strip()
+            if header_text:
+                headers.append(header_text)
+        
+        # If no headers found in thead/tbody, get them from first row
+        if not headers:
+            first_row_cells = table.xpath('.//tbody//tr[1]//td | .//tr[1]//td')
+            for i, cell in enumerate(first_row_cells):
+                headers.append(f"Column_{i+1}")
+        
+        # Extract data rows - skip header rows and footer rows
+        rows = []
+        data_rows = table.xpath('.//tbody//tr[not(contains(@class, "smwfooter"))] | .//tr[position()>1 and not(contains(@class, "smwfooter"))]')
+        
+        for row in data_rows:
+            cells = row.xpath('.//td')
+            if cells:  # Skip empty rows
+                row_data = {}
+                for i, cell in enumerate(cells):
+                    if i < len(headers):
+                        # Get text content, handling links
+                        text_content = cell.text_content().strip()
+                        row_data[headers[i]] = text_content
+                if row_data:  # Only add non-empty rows
+                    rows.append(row_data)
+        
+        return rows
 
-    def crawl_category(self, category_url):
-        """Crawl a category page and extract all items."""
-        self.info(f"Crawling: {category_url}")
-        return self.extract_items_from_page(category_url)
+    def crawl_category(self):
+        self.info(f"Crawling: {self.category_url}")
+        return self.extract_items_from_page(self.category_url)
 
     def crawl_id_page(self, id_url):
-        """Crawl an Id page and extract table data."""
+        """Extract table data from an ID page, handling pagination for large datasets."""
         self.info(f"Extracting table from: {id_url}")
         return self.extract_table_from_id_page(id_url)
 
     def get_page_title(self, url):
-        """Extract the page title from an Aquo page."""
+        """Return page title from h1.firstHeading or <title> tag."""
         try:
             response = self.session.get(url)
             response.raise_for_status()
@@ -202,52 +268,20 @@ class Aquo:
         # Create output directory if it doesn't exist
         os.makedirs(output_dir, exist_ok=True)
         
-        # Get all categories from the main categories page
-        categories_url = "https://www.aquo.nl/index.php/Categorie:Domeintabellen"
-        self.info(f"Fetching categories from: {categories_url}")
+        # Use provided URL or default URL to get all categories
+        if source_url is None:
+            source_url = self.category_url
+        
+        self.info(f"Fetching categories from: {source_url}")
         
         try:
-            response = self.session.get(categories_url)
-            response.raise_for_status()
+            # Get all items using extract_items_from_page with source URL
+            items = self.extract_items_from_page(source_url)
             
-            tree = html.fromstring(response.content)
-            
-            # Find all category links
-            category_links = tree.xpath('//a[contains(@href, "Categorie:")]')
-            
-            categories = set()  # Use set to avoid duplicates
-            for link in category_links:
-                href = link.get('href', '')
-                if 'Categorie:' in href and not href.endswith('Categorie:'):
-                    # Skip URLs with query parameters that cause issues
-                    if '&from=' in href or '&until=' in href:
-                        continue
-                    
-                    # Extract category name from href
-                    if href.startswith('http'):
-                        # Full URL - extract the page name
-                        if 'title=' in href:
-                            # Query parameter format
-                            continue  # Skip these for now as they cause issues
-                        else:
-                            # Direct path format
-                            category_name = href.split('/')[-1]
-                    elif href.startswith('/'):
-                        category_name = href.split('/')[-1]
-                    else:
-                        category_name = href
-                    
-                    # Skip certain meta categories
-                    if category_name not in ['Categorie:Domeintabellen', 'Categorie:Elementen']:
-                        categories.add(category_name)
-            
-            # Also try to get categories from the Actueel page
-            actueel_url = "https://www.aquo.nl/index.php/Categorie:Actueel"
-            items = self.extract_items_from_page(actueel_url)
-            
-            # For each item that looks like a category/domain, add it
+            categories = set()
+            # Convert items to category names
             for item in items:
-                category_name = f"Id-{item['id'].replace('Id-', '')}"
+                category_name = item['id']
                 categories.add(category_name)
             
             self.info(f"Found {len(categories)} categories to download")
@@ -257,10 +291,7 @@ class Aquo:
                 try:
                     if category.startswith('Id-'):
                         # This is an ID page
-                        if category.startswith('http'):
-                            url = category  # Already a full URL
-                        else:
-                            url = f"https://www.aquo.nl/index.php/{category}"
+                        url = self.resolve_url(category)
                         items = self.crawl_id_page(url)
                         
                         # Get the actual title from the page
@@ -270,13 +301,8 @@ class Aquo:
                         else:
                             filename = f"{category.replace('Id-', '')}.csv"
                     else:
-                        # This is a category page
-                        if category.startswith('http'):
-                            url = category  # Already a full URL
-                        else:
-                            url = f"https://www.aquo.nl/index.php/{category}"
-                        items = self.crawl_category(url)
-                        filename = f"{self.sanitize_filename(category)}.csv"
+                        self.error(f"Skipping non-ID category: {category}")
+                        continue
                     
                     if items:
                         filepath = os.path.join(output_dir, filename)
@@ -287,13 +313,13 @@ class Aquo:
                         
                 except Exception as e:
                     self.error(f"  Error downloading {category}: {e}")
+                    # Continue to next category instead of stopping
                     
         except Exception as e:
             self.error(f"Error fetching categories: {e}")
             return
 
     def save_to_csv(self, items, filename):
-        """Save items to CSV file."""
         if not items:
             self.info("No items to save")
             return
@@ -310,11 +336,46 @@ class Aquo:
     
     def find_id_by_name(self, name):
         """Find domain ID by name in Categorie:Actueel"""
-        items = self.crawl_category('https://www.aquo.nl/index.php/Categorie:Actueel')
+        items = self.crawl_category()
         for item in items:
             if item.get('naam', '').lower() == name.lower():
                 return item.get('id')
         return None
+    
+    def resolve_url(self, path_or_url):
+        """Resolve a path or URL against the base Aquo domain."""
+        if not path_or_url:
+            return self.category_url
+            
+        # If it's already a full URL, use as-is
+        if path_or_url.startswith('http'):
+            return path_or_url
+            
+        # If it starts with /, it's a path from the root
+        if path_or_url.startswith('/'):
+            return f"https://www.aquo.nl{path_or_url}"
+            
+        # Otherwise, treat as a page path
+        return f"https://www.aquo.nl/index.php/{path_or_url}"
+    
+    def resolve_relative_url(self, relative_path):
+        """Resolve a relative URL against the base URL from category_url."""
+        from urllib.parse import urlparse, urljoin
+        
+        # Parse the category_url to get the base URL
+        parsed = urlparse(self.category_url)
+        base_url = f"{parsed.scheme}://{parsed.netloc}"
+        
+        # Handle different types of relative paths
+        if relative_path.startswith('/'):
+            # Absolute path from root
+            return f"{base_url}{relative_path}"
+        elif relative_path.startswith('http'):
+            # Already absolute URL
+            return relative_path
+        else:
+            # Relative path, add index.php prefix
+            return f"{base_url}/index.php/{relative_path}"
     
     def resolve_parameter_to_url(self, param):
         """Convert any parameter (URL, ID, name, category) to appropriate URL"""
@@ -324,27 +385,24 @@ class Aquo:
         
         # If it's an ID, construct URL
         if param.startswith('Id-'):
-            return f'https://www.aquo.nl/index.php/{param}'
+            return self.resolve_url(param)
         
         # If it starts with Categorie:, it's a category
         if param.startswith('Categorie:'):
-            return f'https://www.aquo.nl/index.php/{param}'
-        
+            return self.resolve_url(param)
+            
         # If it contains a slash, assume it's a page path
         if '/' in param:
-            return f'https://www.aquo.nl/index.php/{param}'
+            return self.resolve_url(param)
         
         # Otherwise, try to find it as a domain name
         domain_id = self.find_id_by_name(param)
         if domain_id:
-            return f'https://www.aquo.nl/index.php/{domain_id}'
-        
-        # Fallback: treat as category name
-        category_name = param if param.startswith('Categorie:') else f'Categorie:{param}'
-        return f'https://www.aquo.nl/index.php/{category_name}'
+            return self.resolve_url(domain_id)
+        return None
     
     def get_output_stream(self, output):
-        """Get output stream and whether it should be closed"""
+        """Return (stream, should_close) tuple for stdout or file output."""
         if output == '-':
             import sys
             return sys.stdout, False
@@ -352,7 +410,6 @@ class Aquo:
             return open(output, 'w', newline='', encoding='utf-8'), True
     
     def print_table(self, items, output='-'):
-        """Print items as CSV to console or file"""
         if not items:
             self.error("No items found")
             return
@@ -388,50 +445,50 @@ def main():
         ''',
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument('url', nargs='?', default='https://www.aquo.nl/index.php/Categorie:Actueel', 
+    parser.add_argument('url', nargs='?', default='', 
                        help='Aquo URL, ID, category name, or domain name to process')
     parser.add_argument('-o', '--output', default='-', help='Output CSV file')
+    parser.add_argument('-c', '--category', default='https://www.aquo.nl/index.php/Categorie:Actueel',
+                       help='Base category URL (default: Categorie:Actueel)')
     parser.add_argument('--download', action='store_true', help='Download all categories to csvs directory')
     parser.add_argument('-q', '--query', metavar='NAME', help='Query domain name and return only the ID')
     parser.add_argument('-v', '--verbose', action='store_true', help='Enable verbose output')
+    parser.add_argument('-d', '--dir', default="csvs", help='Directory to save downloaded CSV files')
     
     args = parser.parse_args()
     
-    crawler = Aquo(verbose=args.verbose)
+    aquo = Aquo(verbose=args.verbose, category_url=args.category)    
     
     if args.query:
-        domain_id = crawler.find_id_by_name(args.query)
+        domain_id = aquo.find_id_by_name(args.query)
         if domain_id:
             print(domain_id)  # Keep this as regular print since it's output
         else:
-            crawler.error(f"No domain found with name '{args.query}'")
+            aquo.error(f"No domain found with name '{args.query}'")
             sys.exit(1)
         return
     
     if args.download:
-        crawler.download_all_categories()
+        aquo.download_all_categories(output_dir=args.dir)
         return
-    
-    url = crawler.resolve_parameter_to_url(args.url)
-    
-    # Detect extraction method based on URL
-    if '/Id-' in url:
-        # This is an Id page - extract table
-        items = crawler.crawl_id_page(url)
+
+
+    if (args.url):        
+        url = aquo.resolve_parameter_to_url(args.url)
+        if ( url is None ):
+            aquo.error(f"Could not resolve parameter to URL: {args.url}")
+            sys.exit(1)
+        else:
+            items = aquo.crawl_id_page(url)
     else:
-        # This is a category page - extract links
-        items = crawler.crawl_category(url)
+        items = aquo.crawl_category()
     
     if items:
-        crawler.print_table(items, args.output)
+        aquo.print_table(items, args.output)
     else:
-        crawler.error("No items found")
+        aquo.error("No items found")
 
 if __name__ == "__main__":
     main()
 
-
-limit=500
-offset=10
-q=[[Breder::Id-d665b5f3-2cb2-4646-bf27-9eba5bbebe0c]]+%[[Eind+geldigheid::%E2%89%A521+januari+2026%5D%5D&p=mainlabel%3DPagina%2Fformat%3Dtable%2Flink%3Dall%2Fheaders%3Dshow%2Fsearchlabel%3D%E2%80%A6-20overige-20resultaten%2Fclass%3Dtable&po=%3FId%0A%3FTaxonouder%0A%3FTaxonniveau%0A%3FVerwijsnaam%0A%3FTWNstatus%0A%3FTWNmutatiedatum%0A%3FNaam+Nederlands%3DNaam_Nederlands%0A%3FNaam%0A%3FAuteur%0A%3FBegin+geldigheid%0A%3FGerelateerd%0A&sort=Begin+geldigheid&order=descending&eq=no#search
 
