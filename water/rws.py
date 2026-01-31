@@ -2,8 +2,14 @@
 """
 RWS Water Quality Portal (WKP) Data Downloader
 
+This script automates and allows wildcards for the user interface
+
+     https://wkp.rws.nl/downloadmodule
+
 Downloads water quality data from https://wkp.rws.nl/api/v1/data-downloads/download
 Supports subject selection, filtering by year/area, and request limiting for testing.
+
+
 """
 
 import argparse
@@ -17,7 +23,15 @@ import shutil
 from typing import Dict, List, Any, Optional
 import requests
 
-# WKP API Data Structure (Updated from wkp_rws_nl_downloadmodule.md)
+
+# The data structures here define the possible permutations
+# of the requests. First level is a code which specifies the
+# subject id. Then next is the areaLevel, which defines the 
+# areaName. Additionally, there are a number of years. In the UI
+# these are selectable. Since we have them in a structure, we can
+# allow the user of this script to wildcard. 
+
+# WKP API Data Structure
 WKP_DATA = {
     "Waterbeheerder": [
         "Hoogheemraadschap De Stichtse Rijnlanden",
@@ -282,6 +296,10 @@ WKP_DATA = {
     }
 }
 
+#
+# DOWNLOADER CLASS
+#
+
 class WKPDownloader:
     def __init__(self):
         self.api_url = "https://wkp.rws.nl/api/v1/data-downloads/download"
@@ -304,7 +322,6 @@ class WKPDownloader:
         }
 
     def get_matching_subjects(self, patterns: List[str]) -> List[str]:
-        """Get subject IDs that match the given patterns (supports globbing on both codes and IDs)."""
         if not patterns:
             return list(WKP_DATA["subjects"].keys())
         
@@ -326,7 +343,6 @@ class WKPDownloader:
     def expand_requests(self, subject_ids: List[str], year_filter: Optional[List[int]] = None, 
                        level_filter: Optional[List[str]] = None, 
                        name_filter: Optional[List[str]] = None) -> List[Dict[str, Any]]:
-        """Expand subject IDs into all possible API requests."""
         api_requests = []
         
         for subject_id in subject_ids:
@@ -408,7 +424,6 @@ class WKPDownloader:
 
     def download_data(self, api_requests: List[Dict[str, Any]], output_dir: str = "./csvs", 
                      limit: Optional[int] = None, dry_run: bool = False, verbose: bool = False, force: bool = False) -> None:
-        """Download data for the given requests and extract to target directory."""
         if limit:
             api_requests = api_requests[:limit]
             print(f"Limited to first {limit} requests")
@@ -452,10 +467,8 @@ class WKPDownloader:
                 print()
             return
         
-        # Create target output directory
         os.makedirs(output_dir, exist_ok=True)
         
-        # Create temporary directory for zip downloads
         with tempfile.TemporaryDirectory() as temp_dir:
             for i, request in enumerate(api_requests, 1):
                 print(f"Request {i}/{total_requests}: Subject {request['subjectId']}, Year {request['year']}, "
@@ -481,17 +494,14 @@ class WKPDownloader:
                         zip_filename = f"subject_{request['subjectId']}_{safe_name}_year_{request['year']}{area_part}.zip"
                         zip_filepath = os.path.join(temp_dir, zip_filename)
                         
-                        # Save zip file to temp directory
                         with open(zip_filepath, 'wb') as f:
                             f.write(http_response.content)
                         print(f"  Downloaded: {zip_filename} ({len(http_response.content)} bytes)")
                         
-                        # Extract zip contents to output directory
                         try:
                             with zipfile.ZipFile(zip_filepath, 'r') as zip_ref:
                                 extracted_files = zip_ref.namelist()
                                 
-                                # Check for existing files if force is not set
                                 if not force:
                                     existing_files = []
                                     for filename in extracted_files:
@@ -525,16 +535,13 @@ class WKPDownloader:
                 except Exception as e:
                     print(f"  Error: {e}")
                 
-                # Rate limiting
                 if i < total_requests:
                     time.sleep(1)
 
     def show_subject_details(self, codes: List[str]) -> None:
-        """Show detailed information about specific subject codes."""
         print("Subject Details")
         print("=" * 50)
         
-        # Find subjects by code
         found_subjects = []
         for sid, subject in WKP_DATA["subjects"].items():
             if subject.get('subject', '') in codes:
@@ -544,7 +551,6 @@ class WKPDownloader:
             print(f"No subjects found for codes: {', '.join(codes)}")
             return
         
-        # Sort by subject ID and display details
         for _, sid, subject in sorted(found_subjects):
             code_with_id = f"{subject.get('subject', 'N/A')}({sid})"
             print(f"\n{code_with_id}: {subject['name']}")
@@ -592,7 +598,6 @@ class WKPDownloader:
 
 
     def show_info(self, name: str) -> None:
-        """Show detailed information about a specific data component."""
         name_lower = name.lower()
         
         print(f"Information: {name}")
@@ -943,26 +948,20 @@ Examples:
     
     downloader = WKPDownloader()
     
-    # Handle subjects subcommand
     if args.command == 'subjects':
         if args.codes:
-            # Show detailed information about specific subject codes
             downloader.show_subject_details(args.codes)
         else:
-            # Show table format by default
             print("Available Subjects")
             print()
             
-            # Table header
             print(f"{'Code':<10} {'Name':<45} {'Area Type':<20}")
             print(f"{'-'*10:<10} {'-'*45:<45} {'-'*20:<20}")
             
-            # Get all subjects and display
             all_subjects = []
             for sid, subject in WKP_DATA["subjects"].items():
                 all_subjects.append((int(sid), sid, subject))
             
-            # Sort by subject ID and display
             for _, sid, subject in sorted(all_subjects):
                 code_with_id = f"{subject['subject']}({sid})"
                 display_name = subject['name'][:43] + '..' if len(subject['name']) > 45 else subject['name']
@@ -971,7 +970,6 @@ Examples:
             
             print()
     
-    # Handle help subcommand
     elif args.command == 'help':
         print("RWS Water Quality Portal Downloader - Getting Started")
         print("=" * 55)
