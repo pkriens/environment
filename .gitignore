@@ -1,3 +1,4 @@
+copilot/
 # Zip bestanden
 zips/
 
@@ -41,3 +42,4 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+
