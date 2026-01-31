@@ -8,17 +8,14 @@ Supports subject selection, filtering by year/area, and request limiting for tes
 
 import argparse
 import json
-import sys
 import os
 import time
-import glob
 import fnmatch
 import tempfile
 import zipfile
 import shutil
 from typing import Dict, List, Any, Optional
 import requests
-from pathlib import Path
 
 # WKP API Data Structure (Updated from wkp_rws_nl_downloadmodule.md)
 WKP_DATA = {
@@ -532,86 +529,6 @@ class WKPDownloader:
                 if i < total_requests:
                     time.sleep(1)
 
-    def print_hierarchy(self, detailed: bool = False) -> None:
-        """Print the data hierarchy."""
-        print("WKP Data Hierarchy\n==================")
-        
-        if detailed:
-            for theme_name, theme_id in WKP_DATA["themes"].items():
-                print(f"\nTheme {theme_id}: {theme_name}")
-                print("-" * (len(theme_name) + 10))
-                
-                theme_subjects = {sid: subj for sid, subj in WKP_DATA["subjects"].items() 
-                                if subj["theme"] == theme_name}
-                
-                for subject_id, subject in sorted(theme_subjects.items(), key=lambda x: int(x[0])):
-                    print(f"\n  Subject {subject_id}: {subject['name']}")
-                    print(f"    Subject Code: {subject.get('subject', 'N/A')}")
-                    print(f"    Years: {min(subject['years'])}-{max(subject['years'])} ({len(subject['years'])} years)")
-                    print(f"    Area Level Type: {subject['areaLevel']}")
-                    
-                    # Show available areas
-                    if subject['areaLevel'] == 'N':
-                        print(f"    Areas: nederland only")
-                    elif subject['areaLevel'] == 'W':
-                        print(f"    Areas: waterbeheerder only ({len(WKP_DATA['Waterbeheerder'])} authorities)")
-                    elif subject['areaLevel'] in WKP_DATA['areaLevels']:
-                        area_config = WKP_DATA['areaLevels'][subject['areaLevel']]
-                        print(f"    Area levels:")
-                        for level, names in area_config.items():
-                            if level == "nederland":
-                                print(f"      - {level}: nationwide")
-                            else:
-                                print(f"      - {level}: {len(names)} areas")
-        else:
-            print("Themes:")
-            for theme_name, theme_id in WKP_DATA["themes"].items():
-                subject_count = len([s for s in WKP_DATA["subjects"].values() if s["theme"] == theme_name])
-                print(f"  {theme_id}: {theme_name} ({subject_count} subjects)")
-            
-            print(f"\nSubjects: {len(WKP_DATA['subjects'])} total")
-            print("Area level types: N, W, NSPW, NW, NSW, PW")
-            print(f"Water authorities: {len(WKP_DATA['Waterbeheerder'])} total")
-            print(f"Provinces: {len(WKP_DATA['Provincie'])} total") 
-            print(f"River basins: {len(WKP_DATA['Stroomgebieddistricten'])} total")
-
-    def list_subjects(self, theme_filter: Optional[str] = None) -> None:
-        """List all subjects with their details."""
-        print("Available Subjects\n==================")
-        
-        for theme_name, theme_id in WKP_DATA["themes"].items():
-            if theme_filter and theme_name != theme_filter:
-                continue
-                
-            print(f"\nTheme {theme_id}: {theme_name}")
-            print("-" * 50)
-            
-            theme_subjects = {sid: subj for sid, subj in WKP_DATA["subjects"].items() 
-                            if subj["theme"] == theme_name}
-            
-            for subject_id, subject in sorted(theme_subjects.items(), key=lambda x: int(x[0])):
-                year_range = f"{min(subject['years'])}-{max(subject['years'])}"
-                print(f"  {subject_id:2s}: {subject['name']}")
-                print(f"      Code: {subject.get('subject', 'N/A')}, Years: {year_range}, Area Type: {subject['areaLevel']}")
-
-    def list_subjects_by_code(self) -> None:
-        """List subjects organized by their subject codes."""
-        print("Subjects by Code\n================")
-        
-        # Group by subject code
-        by_code = {}
-        for sid, subject in WKP_DATA["subjects"].items():
-            code = subject.get('subject', 'N/A')
-            if code not in by_code:
-                by_code[code] = []
-            by_code[code].append((sid, subject))
-        
-        for code in sorted(by_code.keys()):
-            print(f"\nCode {code}:")
-            for sid, subject in sorted(by_code[code], key=lambda x: int(x[0])):
-                theme_name = subject['theme']
-                print(f"  {sid:2s}: {subject['name']} ({theme_name})")
-
     def show_subject_details(self, codes: List[str]) -> None:
         """Show detailed information about specific subject codes."""
         print("Subject Details")
@@ -945,67 +862,6 @@ class WKPDownloader:
                 print("  General: themes, arealevels, years, labels")
                 print("  Themes: Kaderrichtlijn Water, Ecologie, Oppervlaktewaterkwaliteit, Grondwaterkwaliteit")
                 print("  Subject codes: OKME, KWSG, ECMF, etc.")
-
-    def list_subjects_filtered(self, theme_filter: Optional[str] = None, 
-                             name_filter: Optional[str] = None,
-                             area_level_filter: Optional[str] = None,
-                             area_name_filter: Optional[str] = None) -> None:
-        """List subjects with optional filtering."""
-        print("Available Subjects")
-        if any([theme_filter, name_filter, area_level_filter, area_name_filter]):
-            print(" (filtered)")
-        print("=" * 50)
-        
-        for theme_name, theme_id in WKP_DATA["themes"].items():
-            if theme_filter and theme_name != theme_filter:
-                continue
-                
-            theme_subjects = {sid: subj for sid, subj in WKP_DATA["subjects"].items() 
-                            if subj["theme"] == theme_name}
-            
-            # Apply filters
-            filtered_subjects = {}
-            for sid, subject in theme_subjects.items():
-                # Name filter
-                if name_filter and not fnmatch.fnmatch(subject['name'], name_filter):
-                    continue
-                
-                # Area level filter  
-                if area_level_filter and subject['areaLevel'] != area_level_filter:
-                    continue
-                
-                # Area name filter (check if any area names match)
-                if area_name_filter:
-                    area_level_type = subject['areaLevel']
-                    has_matching_area = False
-                    
-                    if area_level_type == 'W':
-                        has_matching_area = any(fnmatch.fnmatch(name, area_name_filter) 
-                                              for name in WKP_DATA['Waterbeheerder'])
-                    elif area_level_type in WKP_DATA['areaLevels']:
-                        area_config = WKP_DATA['areaLevels'][area_level_type]
-                        for level_areas in area_config.values():
-                            if level_areas != [None]:  # Skip nederland
-                                has_matching_area = any(fnmatch.fnmatch(name, area_name_filter) 
-                                                      for name in level_areas)
-                                if has_matching_area:
-                                    break
-                    
-                    if not has_matching_area:
-                        continue
-                
-                filtered_subjects[sid] = subject
-            
-            if not filtered_subjects:
-                continue
-                
-            print(f"\nTheme {theme_id}: {theme_name}")
-            print("-" * 50)
-            
-            for subject_id, subject in sorted(filtered_subjects.items(), key=lambda x: int(x[0])):
-                year_range = f"{min(subject['years'])}-{max(subject['years'])}"
-                print(f"  {subject_id:2s}: {subject['name']}")
-                print(f"      Code: {subject.get('subject', 'N/A')}, Years: {year_range}, Area Type: {subject['areaLevel']}")
 
 
 def main():
