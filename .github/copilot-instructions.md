@@ -1,8 +1,23 @@
 # GitHub Copilot Instructions
 
-This project builds a comprehensive environmental monitoring database for the Netherlands, integrating water quality, chemical, and ecological data from various Dutch authorities.
+## Project Overview
 
-## Architecture Overview
+This project builds a comprehensive environmental monitoring database for the 
+Netherlands, integrating water quality, chemical, and ecological data from 
+various Dutch authorities.
+
+Key aspect of this project is an architecture where the envdb API is the 
+generic abstract middle which provides support to other external modules to
+create imports and exports. The envdb must be ignorant of these other modules.
+
+The underlying db is intended be maintained by Github Actions.
+
+## Copilot task
+
+Your task is to assist with the development of the envdb API and its related components, 
+not maintain the actual db.
+
+## Directory Overview
 
 * code – All matured python code. 
   * envdb – API for the database. In this project, we have a fully generic db schema.
@@ -23,6 +38,12 @@ This project builds a comprehensive environmental monitoring database for the Ne
 * copilot – Working directory for copilot. All code files and test files that are not yet 
   mature enough to be moved to a final destination remain here. This directory is not stored on
   github.
+
+
+## Secondary Goals
+
+The intention is that this envdb will be also useful for other countries (hence, English) 
+and for other geometric sampled data.
 
 ## envdb schema API
 
