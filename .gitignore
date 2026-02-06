@@ -4,6 +4,11 @@ zips/
 
 # CSV bestanden (te groot voor git)
 csvs/
+water/csvs
+water/aquo/csvs
+
+copilot/
+
 
 # SQLite databases
 *.sqlite

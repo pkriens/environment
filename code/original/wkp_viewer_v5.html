@@ -1,0 +1,3232 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WKP Waterkwaliteit Viewer</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Leaflet Draw voor gebiedsselectie -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+    
+    <!-- SheetJS voor Excel export -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent-blue: #3b82f6;
+            --accent-green: #22c55e;
+            --accent-orange: #f97316;
+            --accent-red: #ef4444;
+            --accent-purple: #a855f7;
+            --accent-cyan: #06b6d4;
+            --border-color: #475569;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+        }
+        
+        .header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .header h1 svg {
+            width: 28px;
+            height: 28px;
+            color: var(--accent-blue);
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+        
+        .btn:hover {
+            background: var(--border-color);
+        }
+        
+        .btn-primary {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        
+        .btn-success {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+        
+        .btn-success:hover {
+            background: #16a34a;
+        }
+        
+        .btn-small {
+            padding: 4px 8px;
+            font-size: 0.75rem;
+        }
+        
+        .btn-danger {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+        }
+        
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            height: calc(100vh - 60px);
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 340px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 16px;
+            overflow-y: auto;
+        }
+        
+        .sidebar h2 {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            letter-spacing: 0.05em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .filter-group {
+            margin-bottom: 20px;
+        }
+        
+        .filter-group label {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        
+        .filter-group select,
+        .filter-group input[type="text"] {
+            width: 100%;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+        
+        /* Loaded Datasets Section */
+        .datasets-section {
+            margin-bottom: 20px;
+        }
+        
+        .dataset-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--bg-tertiary);
+        }
+        
+        .dataset-item {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .dataset-item:last-child {
+            border-bottom: none;
+        }
+        
+        .dataset-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-blue);
+            flex-shrink: 0;
+        }
+        
+        .dataset-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .dataset-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .dataset-meta {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+        
+        .dataset-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        
+        .dataset-remove {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px;
+            font-size: 1rem;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        
+        .dataset-remove:hover {
+            color: var(--accent-red);
+        }
+        
+        .no-datasets {
+            padding: 20px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+        
+        /* Parameter Category Tabs */
+        .category-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 12px;
+        }
+        
+        .category-tab {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+        }
+        
+        .category-tab.active {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: white;
+        }
+        
+        /* Parameter List */
+        .parameter-list {
+            max-height: 180px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--bg-tertiary);
+        }
+        
+        .parameter-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.8rem;
+            transition: background 0.2s;
+        }
+        
+        .parameter-item:last-child {
+            border-bottom: none;
+        }
+        
+        .parameter-item:hover {
+            background: var(--border-color);
+        }
+        
+        .parameter-item.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-left: 3px solid var(--accent-blue);
+        }
+        
+        .parameter-item .param-code {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .parameter-item .param-name {
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            margin-top: 2px;
+        }
+        
+        .parameter-item .param-count {
+            float: right;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+        }
+        
+        /* Search box */
+        .search-box {
+            margin-bottom: 8px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-blue);
+        }
+        
+        /* Color Mode Toggle */
+        .color-mode-toggle {
+            display: flex;
+            gap: 4px;
+            margin-top: 12px;
+        }
+        
+        .color-mode-btn {
+            flex: 1;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+        }
+        
+        .color-mode-btn.active {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: white;
+        }
+        
+        /* Color Scale Selection */
+        .color-scale-select {
+            margin-top: 12px;
+        }
+        
+        .color-scale-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-bottom: 4px;
+        }
+        
+        .color-scale-option:hover {
+            background: var(--bg-tertiary);
+        }
+        
+        .color-scale-option.active {
+            background: rgba(59, 130, 246, 0.2);
+        }
+        
+        .color-scale-preview {
+            width: 80px;
+            height: 16px;
+            border-radius: 3px;
+        }
+        
+        /* Stats Panel */
+        .stats-panel {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 16px;
+        }
+        
+        .stats-panel h3 {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            padding: 4px 0;
+        }
+        
+        .stat-value {
+            font-weight: 600;
+        }
+        
+        /* Map Container */
+        .map-container {
+            flex: 1;
+            position: relative;
+        }
+        
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Legend */
+        .legend {
+            position: absolute;
+            bottom: 30px;
+            left: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            z-index: 1000;
+        }
+        
+        .legend h4 {
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            margin: 4px 0;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+        }
+        
+        /* Year Badge */
+        .year-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 16px;
+            z-index: 1000;
+            font-weight: 600;
+        }
+        
+        /* Data Source Badge */
+        .data-source-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            z-index: 1000;
+            font-size: 0.8rem;
+            max-width: 300px;
+        }
+        
+        .data-source-badge strong {
+            color: var(--accent-blue);
+        }
+        
+        /* Loading Overlay */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Detail Panel */
+        .detail-panel {
+            width: 400px;
+            background: var(--bg-secondary);
+            border-left: 1px solid var(--border-color);
+            padding: 16px;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .detail-panel.active {
+            display: block;
+        }
+        
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+        
+        .detail-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--accent-blue);
+        }
+        
+        .detail-meta {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+        
+        .close-btn:hover {
+            color: var(--text-primary);
+        }
+        
+        /* Stats Cards */
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .stat-card {
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            padding: 12px;
+        }
+        
+        .stat-card .label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        
+        .stat-card .value {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .stat-card .unit {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Chart Container */
+        .chart-container {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            height: 280px;
+            max-height: 280px;
+            overflow: hidden;
+        }
+        
+        .chart-container h3 {
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+        
+        .chart-container canvas {
+            max-height: 180px !important;
+            height: 180px !important;
+        }
+        
+        .chart-wrapper {
+            position: relative;
+            height: 180px;
+            width: 100%;
+        }
+        
+        /* Seizoensgrafieken */
+        .season-container {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .season-container h3 {
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+        
+        .season-charts {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .season-chart-box {
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            padding: 12px;
+        }
+        
+        .season-chart-box h4 {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        
+        .season-chart-wrapper {
+            position: relative;
+            height: 150px;
+            width: 100%;
+        }
+        
+        .season-chart-wrapper canvas {
+            max-height: 150px !important;
+            height: 150px !important;
+        }
+        
+        .detail-param-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 12px;
+        }
+        
+        .detail-param-tab {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+        
+        .detail-param-tab.active {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: white;
+        }
+        
+        /* All parameters table */
+        .params-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+            margin-top: 16px;
+        }
+        
+        .params-table th,
+        .params-table td {
+            padding: 6px 8px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .params-table th {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        
+        .params-table tr:hover {
+            background: var(--bg-tertiary);
+        }
+        
+        /* Scrollable table container */
+        .table-container {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-top: 16px;
+        }
+        
+        /* Popup styling */
+        .leaflet-popup-content-wrapper {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border-radius: 8px;
+        }
+        
+        .leaflet-popup-tip {
+            background: var(--bg-secondary);
+        }
+        
+        .popup-content h3 {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: var(--accent-blue);
+        }
+        
+        .popup-content p {
+            font-size: 0.8rem;
+            margin: 4px 0;
+            color: var(--text-secondary);
+        }
+        
+        .popup-content strong {
+            color: var(--text-primary);
+        }
+        
+        /* Hidden file input */
+        #fileInput {
+            display: none;
+        }
+        
+        /* Welcome overlay */
+        .welcome-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+        }
+        
+        .welcome-overlay.hidden {
+            display: none;
+        }
+        
+        .welcome-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 500px;
+            text-align: center;
+        }
+        
+        .welcome-box h2 {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+            color: var(--accent-blue);
+        }
+        
+        .welcome-box p {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        
+        .welcome-box .btn {
+            margin: 8px;
+        }
+        
+        .drop-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 32px;
+            margin-top: 16px;
+            transition: all 0.2s;
+        }
+        
+        .drop-zone.dragover {
+            border-color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .drop-zone p {
+            margin: 0;
+        }
+        
+        /* Collapsible sections */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 8px 0;
+        }
+        
+        .section-header:hover {
+            color: var(--accent-blue);
+        }
+        
+        .section-toggle {
+            font-size: 0.8rem;
+            transition: transform 0.2s;
+        }
+        
+        .section-toggle.collapsed {
+            transform: rotate(-90deg);
+        }
+        
+        .section-content {
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .section-content.collapsed {
+            max-height: 0 !important;
+        }
+        
+        /* Gebiedsselectie Toolbar */
+        .area-toolbar {
+            position: absolute;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 12px;
+            z-index: 1000;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .area-toolbar span {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .area-btn {
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            border-radius: 4px;
+        }
+        
+        .area-btn.area-a {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+        
+        .area-btn.area-a.active {
+            background: var(--accent-blue);
+            color: white;
+        }
+        
+        .area-btn.area-b {
+            background: rgba(249, 115, 22, 0.2);
+            border-color: var(--accent-orange);
+            color: var(--accent-orange);
+        }
+        
+        .area-btn.area-b.active {
+            background: var(--accent-orange);
+            color: white;
+        }
+        
+        /* Gebiedsanalyse Panel */
+        .area-panel {
+            position: absolute;
+            top: 70px;
+            right: 20px;
+            width: 380px;
+            max-height: calc(100vh - 180px);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            z-index: 1000;
+            display: none;
+            overflow: hidden;
+        }
+        
+        .area-panel.active {
+            display: block;
+        }
+        
+        .area-panel-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .area-panel-header h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .area-panel-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .area-panel-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: var(--text-secondary);
+            border-bottom: 2px solid transparent;
+        }
+        
+        .area-panel-tab.active {
+            color: var(--accent-blue);
+            border-bottom-color: var(--accent-blue);
+        }
+        
+        .area-panel-content {
+            padding: 16px;
+            max-height: calc(100vh - 300px);
+            overflow-y: auto;
+        }
+        
+        .area-stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .area-stat-card {
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            padding: 12px;
+        }
+        
+        .area-stat-card.area-a {
+            border-left: 3px solid var(--accent-blue);
+        }
+        
+        .area-stat-card.area-b {
+            border-left: 3px solid var(--accent-orange);
+        }
+        
+        .area-stat-card h4 {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        
+        .area-stat-card .value {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .area-stat-card .sub {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Year Slider */
+        .year-slider-container {
+            margin-bottom: 16px;
+        }
+        
+        .year-slider-container label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .year-range-display {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .year-slider {
+            width: 100%;
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--bg-tertiary);
+            outline: none;
+        }
+        
+        .year-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            cursor: pointer;
+        }
+        
+        /* Histogram Container */
+        .histogram-container {
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .histogram-container h4 {
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+        }
+        
+        .histogram-wrapper {
+            height: 150px;
+            position: relative;
+        }
+        
+        /* Meetpunten Chart */
+        .meetpunten-chart-container {
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            padding: 12px;
+        }
+        
+        .meetpunten-chart-container h4 {
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+        }
+        
+        .meetpunten-chart-wrapper {
+            height: 200px;
+            position: relative;
+        }
+        
+        .meetpunten-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+            max-height: 60px;
+            overflow-y: auto;
+        }
+        
+        .meetpunt-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.7rem;
+        }
+        
+        .meetpunt-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+            </svg>
+            WKP Waterkwaliteit Viewer
+        </h1>
+        <div class="header-actions">
+            <input type="file" id="fileInput" accept=".geojson,.json" multiple>
+            <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                GeoJSON Laden
+            </button>
+            <button class="btn btn-success" onclick="downloadCombinedGeoJSON()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                GeoJSON Downloaden
+            </button>
+            <button class="btn" onclick="exportData()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                </svg>
+                Excel Export
+            </button>
+        </div>
+    </header>
+    
+    <div class="main-container">
+        <aside class="sidebar">
+            <!-- Loaded Datasets Section -->
+            <div class="datasets-section">
+                <h2>
+                    <span>Geladen Waterschappen</span>
+                    <button class="btn btn-small btn-primary" onclick="document.getElementById('fileInput').click()">+ Toevoegen</button>
+                </h2>
+                <div class="dataset-list" id="datasetList">
+                    <div class="no-datasets">
+                        Nog geen data geladen.<br>
+                        Klik op "GeoJSON Laden" om te beginnen.
+                    </div>
+                </div>
+            </div>
+            
+            <h2>Parameters</h2>
+            
+            <div class="filter-group">
+                <div class="category-tabs" id="categoryTabs">
+                    <button class="category-tab active" data-category="all">Alle</button>
+                    <button class="category-tab" data-category="nutrienten">Nutriënten</button>
+                    <button class="category-tab" data-category="bestrijdingsmiddelen">Bestrijd.</button>
+                    <button class="category-tab" data-category="metalen">Metalen</button>
+                    <button class="category-tab" data-category="fysisch">Fysisch</button>
+                    <button class="category-tab" data-category="zuurstof">Zuurstof</button>
+                    <button class="category-tab" data-category="overig">Overig</button>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" id="paramSearch" placeholder="Zoek parameter...">
+                </div>
+                
+                <div class="parameter-list" id="parameterList">
+                    <!-- Dynamisch gevuld -->
+                </div>
+            </div>
+            
+            <h2>Filters</h2>
+            
+            <div class="filter-group">
+                <label>Jaar</label>
+                <select id="yearSelect">
+                    <option value="">Alle jaren</option>
+                </select>
+            </div>
+            
+            <div class="checkbox-group">
+                <input type="checkbox" id="exceedanceOnly">
+                <label for="exceedanceOnly">Alleen normoverschrijdingen</label>
+            </div>
+            
+            <h2>Kleurenschaal</h2>
+            <div class="color-mode-toggle">
+                <button class="color-mode-btn active" data-mode="norm">% Norm</button>
+                <button class="color-mode-btn" data-mode="value">Concentratie</button>
+            </div>
+            
+            <div class="color-scale-select" id="colorScaleSelect">
+                <label style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 8px; display: block;">Kleurenpalet:</label>
+                <div class="color-scale-option active" data-scale="blue-red">
+                    <div class="color-scale-preview" style="background: linear-gradient(to right, #3b82f6, #22d3ee, #22c55e, #eab308, #f97316, #ef4444);"></div>
+                    <span style="font-size: 0.75rem;">Blauw-Rood</span>
+                </div>
+                <div class="color-scale-option" data-scale="yellow-red">
+                    <div class="color-scale-preview" style="background: linear-gradient(to right, #fef9c3, #fde047, #facc15, #f97316, #ef4444, #b91c1c);"></div>
+                    <span style="font-size: 0.75rem;">Geel-Rood</span>
+                </div>
+                <div class="color-scale-option" data-scale="green-red">
+                    <div class="color-scale-preview" style="background: linear-gradient(to right, #22c55e, #84cc16, #eab308, #f97316, #ef4444);"></div>
+                    <span style="font-size: 0.75rem;">Groen-Rood</span>
+                </div>
+                <div class="color-scale-option" data-scale="viridis">
+                    <div class="color-scale-preview" style="background: linear-gradient(to right, #440154, #3b528b, #21918c, #5ec962, #fde725);"></div>
+                    <span style="font-size: 0.75rem;">Viridis</span>
+                </div>
+            </div>
+            
+            <div class="stats-panel">
+                <h3>Statistieken (geselecteerde data)</h3>
+                <div class="stat-row">
+                    <span>Waterschappen:</span>
+                    <span class="stat-value" id="statWaterschappen">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Meetpunten:</span>
+                    <span class="stat-value" id="statMeetpunten">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Metingen:</span>
+                    <span class="stat-value" id="statMetingen">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Gemiddelde:</span>
+                    <span class="stat-value" id="statGemiddelde">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Overschrijdingen:</span>
+                    <span class="stat-value" id="statOverschrijdingen">0</span>
+                </div>
+            </div>
+        </aside>
+        
+        <main class="map-container">
+            <div id="map"></div>
+            
+            <div class="data-source-badge" id="dataSourceBadge" style="display: none;">
+                <strong>Geladen:</strong> <span id="sourceCount">0</span> waterschappen<br>
+                <strong>Totaal meetpunten:</strong> <span id="sourceTotalPoints">0</span><br>
+                <strong>Jaren:</strong> <span id="sourceJaren">-</span>
+            </div>
+            
+            <div class="year-badge" id="yearBadge">Alle jaren</div>
+            
+            <!-- Gebiedsselectie Toolbar -->
+            <div class="area-toolbar" id="areaToolbar" style="display: none;">
+                <span>Gebied selectie:</span>
+                <button class="btn area-btn area-a" id="btnAreaA" onclick="startDrawArea('A')">☐ Gebied A</button>
+                <button class="btn area-btn area-b" id="btnAreaB" onclick="startDrawArea('B')">☐ Gebied B</button>
+                <button class="btn btn-small" onclick="clearAreas()">Wissen</button>
+            </div>
+            
+            <!-- Gebiedsanalyse Panel -->
+            <div class="area-panel" id="areaPanel">
+                <div class="area-panel-header">
+                    <h3>Gebiedsanalyse</h3>
+                    <button class="close-btn" onclick="closeAreaPanel()">&times;</button>
+                </div>
+                <div class="area-panel-tabs">
+                    <button class="area-panel-tab active" data-tab="stats" onclick="switchAreaTab('stats')">Statistieken</button>
+                    <button class="area-panel-tab" data-tab="histogram" onclick="switchAreaTab('histogram')">Histogram</button>
+                    <button class="area-panel-tab" data-tab="meetpunten" onclick="switchAreaTab('meetpunten')">Meetpunten</button>
+                </div>
+                <div class="area-panel-content" id="areaPanelContent">
+                    <!-- Statistieken Tab -->
+                    <div class="area-tab-content" id="tabStats">
+                        <div class="area-stats-grid" id="areaStatsGrid">
+                            <!-- Dynamisch gevuld -->
+                        </div>
+                        <div class="histogram-container">
+                            <h4>Vergelijking gemiddelden</h4>
+                            <div class="histogram-wrapper">
+                                <canvas id="compareChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Histogram Tab -->
+                    <div class="area-tab-content" id="tabHistogram" style="display: none;">
+                        <div class="year-slider-container">
+                            <label>Jaar filter</label>
+                            <div class="year-range-display">
+                                <span id="yearRangeStart">2009</span>
+                                <span id="yearRangeEnd">2024</span>
+                            </div>
+                            <input type="range" class="year-slider" id="yearSliderMin" min="2009" max="2024" value="2009">
+                            <input type="range" class="year-slider" id="yearSliderMax" min="2009" max="2024" value="2024" style="margin-top: 8px;">
+                        </div>
+                        <div class="histogram-container">
+                            <h4>Gebied A</h4>
+                            <div class="histogram-wrapper">
+                                <canvas id="histogramA"></canvas>
+                            </div>
+                        </div>
+                        <div class="histogram-container">
+                            <h4>Gebied B</h4>
+                            <div class="histogram-wrapper">
+                                <canvas id="histogramB"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Meetpunten Tab -->
+                    <div class="area-tab-content" id="tabMeetpunten" style="display: none;">
+                        <div class="meetpunten-chart-container">
+                            <h4>Tijdreeks per meetpunt</h4>
+                            <div class="meetpunten-chart-wrapper">
+                                <canvas id="meetpuntenChart"></canvas>
+                            </div>
+                            <div class="meetpunten-legend" id="meetpuntenLegend">
+                                <!-- Dynamisch gevuld -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="legend" id="legend">
+                <h4 id="legendTitle">Legenda (% van norm)</h4>
+                <div id="legendContent">
+                    <!-- Dynamisch gevuld -->
+                </div>
+            </div>
+            
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="spinner"></div>
+            </div>
+            
+            <!-- Welcome overlay -->
+            <div class="welcome-overlay" id="welcomeOverlay">
+                <div class="welcome-box">
+                    <h2>WKP Waterkwaliteit Viewer</h2>
+                    <p>
+                        Welkom bij de Waterkwaliteitsportaal (WKP) viewer. 
+                        Upload één of meerdere GeoJSON bestanden om de waterkwaliteitsdata te visualiseren.
+                    </p>
+                    <p style="font-size: 0.85rem;">
+                        Je kunt meerdere waterschappen tegelijk laden en selecteren welke je wilt tonen.
+                    </p>
+                    <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                        GeoJSON Laden
+                    </button>
+                    <div class="drop-zone" id="dropZone">
+                        <p>Of sleep GeoJSON bestanden hierheen</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <aside class="detail-panel" id="detailPanel">
+            <div class="detail-header">
+                <div>
+                    <div class="detail-title" id="detailTitle">-</div>
+                    <div class="detail-meta" id="detailMeta">-</div>
+                </div>
+                <button class="close-btn" onclick="closeDetailPanel()">&times;</button>
+            </div>
+            
+            <div class="stats-cards" id="detailStats">
+                <!-- Dynamisch gevuld -->
+            </div>
+            
+            <div class="chart-container">
+                <h3>Tijdreeks</h3>
+                <div class="detail-param-tabs" id="chartParamTabs">
+                    <!-- Dynamisch gevuld -->
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Seizoensgrafieken sectie -->
+            <div class="season-container">
+                <h3>Seizoensanalyse</h3>
+                <div class="season-charts">
+                    <div class="season-chart-box">
+                        <h4>Maandgemiddelden</h4>
+                        <div class="season-chart-wrapper">
+                            <canvas id="monthlyChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="season-chart-box">
+                        <h4>Seizoens Box Plots</h4>
+                        <div class="season-chart-wrapper">
+                            <canvas id="seasonBoxChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="params-table" id="paramsTable">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Gem.</th>
+                            <th>Max</th>
+                            <th>Aantal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paramsTableBody">
+                        <!-- Dynamisch gevuld -->
+                    </tbody>
+                </table>
+            </div>
+        </aside>
+    </div>
+    
+    <script>
+        // Globale variabelen
+        let map;
+        let markersLayer;
+        
+        // Meerdere datasets opslaan
+        let loadedDatasets = {}; // key: waterbeheerder naam, value: { data, visible, color }
+        let datasetColors = [
+            '#3b82f6', '#22c55e', '#f97316', '#a855f7', '#06b6d4', 
+            '#ec4899', '#eab308', '#14b8a6', '#8b5cf6', '#f43f5e'
+        ];
+        let colorIndex = 0;
+        
+        // Gecombineerde data voor weergave
+        let combinedFeatures = [];
+        let parameterCatalog = {};
+        
+        let currentParameter = 'NO3';
+        let currentCategory = 'all';
+        let colorMode = 'norm';
+        let colorScale = 'blue-red';
+        let trendChart = null;
+        let selectedFeature = null;
+        
+        // Gebiedsselectie variabelen
+        let drawnItems = null;
+        let drawControl = null;
+        let currentDrawArea = null; // 'A' of 'B'
+        let areaA = null; // Leaflet layer
+        let areaB = null; // Leaflet layer
+        let areaAFeatures = []; // Features in gebied A
+        let areaBFeatures = []; // Features in gebied B
+        let compareChart = null;
+        let histogramAChart = null;
+        let histogramBChart = null;
+        let meetpuntenChart = null;
+        let yearRangeMin = 2009;
+        let yearRangeMax = 2024;
+        
+        // Seizoensgrafieken variabelen
+        let monthlyChart = null;
+        let seasonBoxChart = null;
+        
+        // Standaard normen
+        const DEFAULT_NORMEN = {
+            'NO3': 50,
+            'Ntot': 50,
+            'PO4': 0.15,
+            'Ptot': 0.15,
+            'SOM_BESTR': 0.5,
+            'O2': 5,
+            'NH4': 0.4,
+            'NH3': 0.02
+        };
+        
+        // Kleurenschalen
+        const COLOR_SCALES = {
+            'blue-red': [
+                { pos: 0.0, r: 59, g: 130, b: 246 },
+                { pos: 0.2, r: 34, g: 211, b: 238 },
+                { pos: 0.4, r: 34, g: 197, b: 94 },
+                { pos: 0.6, r: 234, g: 179, b: 8 },
+                { pos: 0.8, r: 249, g: 115, b: 22 },
+                { pos: 1.0, r: 239, g: 68, b: 68 }
+            ],
+            'yellow-red': [
+                { pos: 0.0, r: 254, g: 249, b: 195 },
+                { pos: 0.2, r: 253, g: 224, b: 71 },
+                { pos: 0.4, r: 250, g: 204, b: 21 },
+                { pos: 0.6, r: 249, g: 115, b: 22 },
+                { pos: 0.8, r: 239, g: 68, b: 68 },
+                { pos: 1.0, r: 185, g: 28, b: 28 }
+            ],
+            'green-red': [
+                { pos: 0.0, r: 34, g: 197, b: 94 },
+                { pos: 0.25, r: 132, g: 204, b: 22 },
+                { pos: 0.5, r: 234, g: 179, b: 8 },
+                { pos: 0.75, r: 249, g: 115, b: 22 },
+                { pos: 1.0, r: 239, g: 68, b: 68 }
+            ],
+            'viridis': [
+                { pos: 0.0, r: 68, g: 1, b: 84 },
+                { pos: 0.25, r: 59, g: 82, b: 139 },
+                { pos: 0.5, r: 33, g: 145, b: 140 },
+                { pos: 0.75, r: 94, g: 201, b: 98 },
+                { pos: 1.0, r: 253, g: 231, b: 37 }
+            ]
+        };
+        
+        // Initialisatie
+        document.addEventListener('DOMContentLoaded', () => {
+            initMap();
+            setupEventListeners();
+        });
+        
+        function initMap() {
+            map = L.map('map').setView([52.1, 5.1], 8);
+            
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap &copy; CARTO',
+                maxZoom: 19
+            }).addTo(map);
+            
+            markersLayer = L.layerGroup().addTo(map);
+        }
+        
+        function setupEventListeners() {
+            // File input - now supports multiple files
+            document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+            
+            // Drag and drop
+            const dropZone = document.getElementById('dropZone');
+            const welcomeOverlay = document.getElementById('welcomeOverlay');
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+                welcomeOverlay.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+            });
+            
+            dropZone.addEventListener('drop', handleDrop, false);
+            welcomeOverlay.addEventListener('drop', handleDrop, false);
+            
+            // Category tabs
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentCategory = tab.dataset.category;
+                    updateParameterList();
+                });
+            });
+            
+            // Parameter search
+            document.getElementById('paramSearch').addEventListener('input', updateParameterList);
+            
+            // Filters
+            document.getElementById('yearSelect').addEventListener('change', updateMap);
+            document.getElementById('exceedanceOnly').addEventListener('change', updateMap);
+            
+            // Color mode
+            document.querySelectorAll('.color-mode-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.color-mode-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    colorMode = btn.dataset.mode;
+                    updateMap();
+                });
+            });
+            
+            // Color scale
+            document.querySelectorAll('.color-scale-option').forEach(opt => {
+                opt.addEventListener('click', () => {
+                    document.querySelectorAll('.color-scale-option').forEach(o => o.classList.remove('active'));
+                    opt.classList.add('active');
+                    colorScale = opt.dataset.scale;
+                    updateMap();
+                });
+            });
+        }
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length > 0) {
+                loadFiles(Array.from(files));
+            }
+        }
+        
+        function handleFileSelect(e) {
+            const files = Array.from(e.target.files);
+            if (files.length > 0) {
+                loadFiles(files);
+            }
+            // Reset input so same file can be loaded again
+            e.target.value = '';
+        }
+        
+        function loadFiles(files) {
+            showLoading(true);
+            
+            let loaded = 0;
+            const total = files.length;
+            
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        addDataset(data, file.name);
+                    } catch (err) {
+                        console.error('Fout bij laden van ' + file.name + ': ' + err.message);
+                    }
+                    
+                    loaded++;
+                    if (loaded === total) {
+                        processAllDatasets();
+                        document.getElementById('welcomeOverlay').classList.add('hidden');
+                        showLoading(false);
+                    }
+                };
+                reader.readAsText(file);
+            });
+        }
+        
+        function addDataset(data, filename) {
+            if (!data || !data.features) {
+                console.error('Ongeldig GeoJSON formaat: ' + filename);
+                return;
+            }
+            
+            // Bepaal waterbeheerder naam
+            let waterbeheerder = data.metadata?.waterbeheerder || 
+                                 filename.replace('.geojson', '').replace('.json', '');
+            
+            // Als waterbeheerder al bestaat, maak unieke naam
+            let uniqueName = waterbeheerder;
+            let counter = 1;
+            while (loadedDatasets[uniqueName]) {
+                uniqueName = waterbeheerder + ' (' + counter + ')';
+                counter++;
+            }
+            
+            // Wijs kleur toe
+            const color = datasetColors[colorIndex % datasetColors.length];
+            colorIndex++;
+            
+            // Sla dataset op
+            loadedDatasets[uniqueName] = {
+                data: data,
+                visible: true,
+                color: color,
+                filename: filename
+            };
+            
+            console.log('Dataset geladen: ' + uniqueName + ' (' + data.features.length + ' features)');
+        }
+        
+        function processAllDatasets() {
+            // Combineer alle zichtbare features
+            combinedFeatures = [];
+            parameterCatalog = {};
+            
+            Object.entries(loadedDatasets).forEach(([name, dataset]) => {
+                if (dataset.visible) {
+                    // Voeg waterbeheerder naam toe aan elke feature
+                    dataset.data.features.forEach(f => {
+                        const featureCopy = JSON.parse(JSON.stringify(f));
+                        featureCopy.properties._datasetName = name;
+                        featureCopy.properties._datasetColor = dataset.color;
+                        combinedFeatures.push(featureCopy);
+                    });
+                    
+                    // Combineer parameter catalogus
+                    if (dataset.data.parameters) {
+                        Object.assign(parameterCatalog, dataset.data.parameters);
+                    }
+                }
+            });
+            
+            // Update UI
+            updateDatasetList();
+            updateMetadataDisplay();
+            populateFilters();
+            updateParameterList();
+            selectFirstParameter();
+            updateMap();
+            fitMapBounds();
+            
+            // Initialiseer gebiedsselectie als dat nog niet is gedaan
+            if (!drawnItems) {
+                initDrawControl();
+            }
+            
+            // Update jaar sliders op basis van beschikbare jaren
+            updateYearSliders();
+        }
+        
+        function updateDatasetList() {
+            const list = document.getElementById('datasetList');
+            const datasets = Object.entries(loadedDatasets);
+            
+            if (datasets.length === 0) {
+                list.innerHTML = `
+                    <div class="no-datasets">
+                        Nog geen data geladen.<br>
+                        Klik op "GeoJSON Laden" om te beginnen.
+                    </div>
+                `;
+                return;
+            }
+            
+            list.innerHTML = datasets.map(([name, dataset]) => {
+                const featureCount = dataset.data.features.length;
+                const jaren = dataset.data.metadata?.jaren?.join(', ') || '-';
+                
+                return `
+                    <div class="dataset-item">
+                        <input type="checkbox" 
+                               ${dataset.visible ? 'checked' : ''} 
+                               onchange="toggleDataset('${name}', this.checked)">
+                        <div class="dataset-color" style="background: ${dataset.color};"></div>
+                        <div class="dataset-info">
+                            <div class="dataset-name" title="${name}">${name}</div>
+                            <div class="dataset-meta">${featureCount} meetpunten | ${jaren}</div>
+                        </div>
+                        <button class="dataset-remove" onclick="removeDataset('${name}')" title="Verwijderen">&times;</button>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function toggleDataset(name, visible) {
+            if (loadedDatasets[name]) {
+                loadedDatasets[name].visible = visible;
+                processAllDatasets();
+            }
+        }
+        
+        function removeDataset(name) {
+            if (loadedDatasets[name]) {
+                delete loadedDatasets[name];
+                processAllDatasets();
+                
+                // Toon welcome overlay als geen datasets meer
+                if (Object.keys(loadedDatasets).length === 0) {
+                    document.getElementById('welcomeOverlay').classList.remove('hidden');
+                }
+            }
+        }
+        
+        function updateMetadataDisplay() {
+            const badge = document.getElementById('dataSourceBadge');
+            
+            const visibleDatasets = Object.values(loadedDatasets).filter(d => d.visible);
+            const totalPoints = combinedFeatures.length;
+            
+            // Verzamel alle jaren
+            const alleJaren = new Set();
+            visibleDatasets.forEach(d => {
+                (d.data.metadata?.jaren || []).forEach(j => alleJaren.add(j));
+            });
+            
+            document.getElementById('sourceCount').textContent = visibleDatasets.length;
+            document.getElementById('sourceTotalPoints').textContent = totalPoints.toLocaleString();
+            document.getElementById('sourceJaren').textContent = 
+                Array.from(alleJaren).sort().join(', ') || '-';
+            
+            badge.style.display = visibleDatasets.length > 0 ? 'block' : 'none';
+        }
+        
+        function populateFilters() {
+            // Collect years from all visible datasets
+            const jaren = new Set();
+            
+            combinedFeatures.forEach(f => {
+                const props = f.properties;
+                if (props.jaren) {
+                    props.jaren.forEach(j => jaren.add(j));
+                }
+            });
+            
+            // Populate year select
+            const yearSelect = document.getElementById('yearSelect');
+            const currentValue = yearSelect.value;
+            yearSelect.innerHTML = '<option value="">Alle jaren</option>';
+            Array.from(jaren).sort().forEach(jaar => {
+                yearSelect.innerHTML += `<option value="${jaar}">${jaar}</option>`;
+            });
+            // Restore selection if still valid
+            if (Array.from(jaren).includes(currentValue)) {
+                yearSelect.value = currentValue;
+            }
+        }
+        
+        function updateParameterList() {
+            const searchTerm = document.getElementById('paramSearch').value.toLowerCase();
+            const list = document.getElementById('parameterList');
+            list.innerHTML = '';
+            
+            if (combinedFeatures.length === 0) {
+                list.innerHTML = '<div class="no-datasets">Geen data geladen</div>';
+                return;
+            }
+            
+            // Count parameters per feature
+            const paramCounts = {};
+            combinedFeatures.forEach(f => {
+                const stats = f.properties.parameter_stats || {};
+                Object.keys(stats).forEach(code => {
+                    if (!paramCounts[code]) paramCounts[code] = 0;
+                    paramCounts[code] += stats[code].aantal || 0;
+                });
+            });
+            
+            // Categorie mapping: sommige categorieën in de data moeten naar UI categorieën
+            const categoryMapping = {
+                'organisch': 'overig'  // organisch valt onder overig in de UI
+            };
+            
+            // Filter and sort parameters
+            const params = Object.entries(parameterCatalog)
+                .filter(([code, info]) => {
+                    // Category filter met mapping
+                    const dataCategory = info.categorie || 'overig';
+                    const mappedCategory = categoryMapping[dataCategory] || dataCategory;
+                    if (currentCategory !== 'all' && mappedCategory !== currentCategory) {
+                        return false;
+                    }
+                    // Search filter
+                    if (searchTerm) {
+                        const searchStr = `${code} ${info.naam || ''}`.toLowerCase();
+                        if (!searchStr.includes(searchTerm)) {
+                            return false;
+                        }
+                    }
+                    // Only show params with data
+                    return paramCounts[code] > 0;
+                })
+                .sort((a, b) => (paramCounts[b[0]] || 0) - (paramCounts[a[0]] || 0));
+            
+            if (params.length === 0) {
+                list.innerHTML = '<div class="no-datasets">Geen parameters gevonden</div>';
+                return;
+            }
+            
+            params.forEach(([code, info]) => {
+                const div = document.createElement('div');
+                div.className = `parameter-item ${code === currentParameter ? 'active' : ''}`;
+                div.innerHTML = `
+                    <span class="param-count">${(paramCounts[code] || 0).toLocaleString()}</span>
+                    <div class="param-code">${code}</div>
+                    <div class="param-name">${info.naam || ''}</div>
+                `;
+                div.addEventListener('click', () => selectParameter(code));
+                list.appendChild(div);
+            });
+        }
+        
+        function selectFirstParameter() {
+            if (Object.keys(parameterCatalog).length === 0) return;
+            
+            // Try common parameters first
+            const preferredParams = ['NO3', 'Ntot', 'PO4', 'Ptot', 'O2', 'Cl'];
+            
+            for (const param of preferredParams) {
+                if (parameterCatalog[param]) {
+                    currentParameter = param;
+                    return;
+                }
+            }
+            
+            // Otherwise select first available
+            const firstParam = Object.keys(parameterCatalog)[0];
+            if (firstParam) {
+                currentParameter = firstParam;
+            }
+        }
+        
+        function selectParameter(code) {
+            currentParameter = code;
+            updateParameterList();
+            updateMap();
+            
+            if (selectedFeature) {
+                updateDetailPanel(selectedFeature);
+            }
+            
+            // Update gebiedsanalyse als er gebieden zijn geselecteerd
+            if (areaA || areaB) {
+                updateAreaAnalysis();
+            }
+        }
+        
+        function getNorm(paramCode) {
+            const param = parameterCatalog[paramCode];
+            if (param && param.norm) {
+                return param.norm;
+            }
+            return DEFAULT_NORMEN[paramCode] || null;
+        }
+        
+        function getParameterValue(props, paramCode) {
+            const stats = props.parameter_stats || {};
+            if (stats[paramCode]) {
+                return stats[paramCode].gemiddelde;
+            }
+            return 0;
+        }
+        
+        function getParameterCount(props, paramCode) {
+            const stats = props.parameter_stats || {};
+            if (stats[paramCode]) {
+                return stats[paramCode].aantal;
+            }
+            return 0;
+        }
+        
+        // Globale min/max voor concentratie modus
+        let globalMinVal = 0;
+        let globalMaxVal = 100;
+        
+        function calculateGlobalMinMax() {
+            globalMinVal = Infinity;
+            globalMaxVal = 0;
+            
+            combinedFeatures.forEach(f => {
+                const val = getParameterValue(f.properties, currentParameter);
+                if (val > 0) {
+                    globalMinVal = Math.min(globalMinVal, val);
+                    globalMaxVal = Math.max(globalMaxVal, val);
+                }
+            });
+            
+            if (globalMinVal === Infinity) globalMinVal = 0;
+            if (globalMaxVal === 0) {
+                const norm = getNorm(currentParameter);
+                globalMaxVal = norm ? norm * 2 : 100;
+            }
+        }
+        
+        function interpolateColor(ratio) {
+            ratio = Math.max(0, Math.min(1, ratio));
+            const stops = COLOR_SCALES[colorScale] || COLOR_SCALES['blue-red'];
+            
+            let lower = stops[0];
+            let upper = stops[stops.length - 1];
+            
+            for (let i = 0; i < stops.length - 1; i++) {
+                if (ratio >= stops[i].pos && ratio <= stops[i + 1].pos) {
+                    lower = stops[i];
+                    upper = stops[i + 1];
+                    break;
+                }
+            }
+            
+            const localRatio = (ratio - lower.pos) / (upper.pos - lower.pos);
+            
+            const r = Math.round(lower.r + (upper.r - lower.r) * localRatio);
+            const g = Math.round(lower.g + (upper.g - lower.g) * localRatio);
+            const b = Math.round(lower.b + (upper.b - lower.b) * localRatio);
+            
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+        
+        function getColor(value, norm) {
+            if (colorMode === 'norm' && norm) {
+                const pct = (value / norm) * 100;
+                if (pct < 50) return '#22c55e';
+                if (pct < 75) return '#eab308';
+                if (pct < 100) return '#f97316';
+                return '#ef4444';
+            } else {
+                const range = globalMaxVal - globalMinVal;
+                const ratio = range > 0 ? (value - globalMinVal) / range : 0;
+                return interpolateColor(ratio);
+            }
+        }
+        
+        function updateMap() {
+            if (combinedFeatures.length === 0) {
+                markersLayer.clearLayers();
+                updateStats(0, 0, 0, 0, 0);
+                return;
+            }
+            
+            calculateGlobalMinMax();
+            updateLegend();
+            
+            markersLayer.clearLayers();
+            
+            const selectedYear = document.getElementById('yearSelect').value;
+            const exceedanceOnly = document.getElementById('exceedanceOnly').checked;
+            const norm = getNorm(currentParameter);
+            
+            let visibleWaterschappen = new Set();
+            let totalMeetpunten = 0;
+            let totalMetingen = 0;
+            let totalValue = 0;
+            let valueCount = 0;
+            let exceedanceCount = 0;
+            
+            combinedFeatures.forEach(feature => {
+                const props = feature.properties;
+                const coords = feature.geometry.coordinates;
+                
+                // Year filter
+                if (selectedYear && props.jaren && !props.jaren.includes(selectedYear)) {
+                    return;
+                }
+                
+                // Get parameter value
+                const value = getParameterValue(props, currentParameter);
+                const count = getParameterCount(props, currentParameter);
+                
+                if (count === 0) return;
+                
+                // Exceedance filter
+                if (exceedanceOnly && norm && value <= norm) {
+                    return;
+                }
+                
+                // Stats
+                visibleWaterschappen.add(props._datasetName);
+                totalMeetpunten++;
+                totalMetingen += count;
+                totalValue += value;
+                valueCount++;
+                if (norm && value > norm) exceedanceCount++;
+                
+                // Create marker
+                const color = getColor(value, norm);
+                const marker = L.circleMarker([coords[1], coords[0]], {
+                    radius: 6,
+                    fillColor: color,
+                    color: '#fff',
+                    weight: 1,
+                    opacity: 0.8,
+                    fillOpacity: 0.8
+                });
+                
+                // Popup
+                const paramInfo = parameterCatalog[currentParameter] || {};
+                const eenheid = paramInfo.eenheid || '';
+                const pctNorm = norm ? ((value / norm) * 100).toFixed(0) : '-';
+                
+                marker.bindPopup(`
+                    <div class="popup-content">
+                        <h3>${props.code}</h3>
+                        <p><strong>Waterschap:</strong> ${props.waterschap || props._datasetName || '-'}</p>
+                        <p><strong>Omschrijving:</strong> ${props.omschrijving || '-'}</p>
+                        <p><strong>${paramInfo.naam || currentParameter}:</strong> ${value.toFixed(3)} ${eenheid}</p>
+                        ${norm ? `<p><strong>% van norm:</strong> ${pctNorm}%</p>` : ''}
+                    </div>
+                `);
+                
+                marker.on('click', () => {
+                    selectedFeature = feature;
+                    showDetailPanel(feature);
+                });
+                
+                marker.addTo(markersLayer);
+            });
+            
+            // Update stats
+            updateStats(
+                visibleWaterschappen.size,
+                totalMeetpunten,
+                totalMetingen,
+                valueCount > 0 ? totalValue / valueCount : 0,
+                exceedanceCount,
+                valueCount
+            );
+            
+            // Update year badge
+            document.getElementById('yearBadge').textContent = selectedYear || 'Alle jaren';
+        }
+        
+        function updateStats(waterschappen, meetpunten, metingen, gemiddelde, overschrijdingen, totaal) {
+            document.getElementById('statWaterschappen').textContent = waterschappen;
+            document.getElementById('statMeetpunten').textContent = meetpunten.toLocaleString();
+            document.getElementById('statMetingen').textContent = metingen.toLocaleString();
+            document.getElementById('statGemiddelde').textContent = 
+                gemiddelde.toFixed(3) + ' ' + (parameterCatalog[currentParameter]?.eenheid || '');
+            document.getElementById('statOverschrijdingen').textContent = 
+                `${overschrijdingen} (${totaal > 0 ? ((overschrijdingen/totaal)*100).toFixed(1) : 0}%)`;
+        }
+        
+        function updateLegend() {
+            const title = document.getElementById('legendTitle');
+            const content = document.getElementById('legendContent');
+            const norm = getNorm(currentParameter);
+            const paramInfo = parameterCatalog[currentParameter] || {};
+            const eenheid = paramInfo.eenheid || '';
+            
+            if (colorMode === 'norm' && norm) {
+                title.textContent = `Legenda (% van norm: ${norm} ${eenheid})`;
+                content.innerHTML = `
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #22c55e;"></div>
+                        <span>&lt; 50% norm</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #eab308;"></div>
+                        <span>50-75% norm</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #f97316;"></div>
+                        <span>75-100% norm</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ef4444;"></div>
+                        <span>&gt; 100% norm</span>
+                    </div>
+                `;
+            } else {
+                const minVal = globalMinVal;
+                const maxVal = globalMaxVal;
+                const midVal = (minVal + maxVal) / 2;
+                
+                // Get gradient CSS for current color scale
+                const stops = COLOR_SCALES[colorScale] || COLOR_SCALES['blue-red'];
+                const gradientStops = stops.map(s => `rgb(${s.r}, ${s.g}, ${s.b})`).join(', ');
+                
+                title.textContent = `${paramInfo.naam || currentParameter} (${eenheid})`;
+                content.innerHTML = `
+                    <div style="margin-bottom: 4px;">
+                        <div style="width: 200px; height: 16px; border-radius: 4px; background: linear-gradient(to right, ${gradientStops});"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; width: 200px;">
+                        <span>${minVal.toFixed(2)}</span>
+                        <span>${midVal.toFixed(2)}</span>
+                        <span>${maxVal.toFixed(2)}</span>
+                    </div>
+                `;
+            }
+        }
+        
+        function fitMapBounds() {
+            if (combinedFeatures.length === 0) return;
+            
+            const bounds = L.latLngBounds();
+            combinedFeatures.forEach(f => {
+                const coords = f.geometry.coordinates;
+                bounds.extend([coords[1], coords[0]]);
+            });
+            
+            if (bounds.isValid()) {
+                map.fitBounds(bounds, { padding: [50, 50] });
+            }
+        }
+        
+        function showDetailPanel(feature) {
+            const panel = document.getElementById('detailPanel');
+            panel.classList.add('active');
+            updateDetailPanel(feature);
+        }
+        
+        function updateDetailPanel(feature) {
+            const props = feature.properties;
+            
+            // Header
+            document.getElementById('detailTitle').textContent = props.code;
+            document.getElementById('detailMeta').textContent = 
+                `${props.waterschap || props._datasetName || '-'} | ${props.omschrijving || props.code}`;
+            
+            // Stats cards
+            const paramInfo = parameterCatalog[currentParameter] || {};
+            const stats = props.parameter_stats?.[currentParameter] || {};
+            const norm = getNorm(currentParameter);
+            
+            document.getElementById('detailStats').innerHTML = `
+                <div class="stat-card">
+                    <div class="label">${paramInfo.naam || currentParameter} (gem.)</div>
+                    <div class="value">${(stats.gemiddelde || 0).toFixed(3)}</div>
+                    <div class="unit">${paramInfo.eenheid || ''}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Maximum</div>
+                    <div class="value">${(stats.maximum || 0).toFixed(3)}</div>
+                    <div class="unit">${paramInfo.eenheid || ''}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Aantal metingen</div>
+                    <div class="value">${stats.aantal || 0}</div>
+                    <div class="unit">stuks</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">% van norm</div>
+                    <div class="value">${norm ? ((stats.gemiddelde || 0) / norm * 100).toFixed(0) : '-'}</div>
+                    <div class="unit">${norm ? '%' : ''}</div>
+                </div>
+            `;
+            
+            // Parameter tabs
+            const availableParams = Object.keys(props.parameter_stats || {}).filter(
+                code => (props.parameter_stats[code]?.aantal || 0) > 0
+            );
+            
+            availableParams.sort((a, b) => 
+                (props.parameter_stats[b]?.aantal || 0) - (props.parameter_stats[a]?.aantal || 0)
+            );
+            
+            const topParams = availableParams.slice(0, 10);
+            
+            document.getElementById('chartParamTabs').innerHTML = topParams.map(code => `
+                <button class="detail-param-tab ${code === currentParameter ? 'active' : ''}"
+                        data-code="${code}" onclick="selectChartParam('${code}')">
+                    ${code}
+                </button>
+            `).join('');
+            
+            // Update chart
+            updateTrendChart(feature, currentParameter);
+            
+            // Update seizoensgrafieken
+            updateSeasonCharts(feature, currentParameter);
+            
+            // Update parameters table
+            updateParamsTable(feature);
+        }
+        
+        function selectChartParam(code) {
+            document.querySelectorAll('.detail-param-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.detail-param-tab[data-code="${code}"]`)?.classList.add('active');
+            updateTrendChart(selectedFeature, code);
+            updateSeasonCharts(selectedFeature, code);
+        }
+        
+        function updateTrendChart(feature, paramCode) {
+            const props = feature.properties;
+            const tijdreeksen = props.tijdreeksen || {};
+            const tijdreeks = tijdreeksen[paramCode] || [];
+            
+            const sortedData = [...tijdreeks].sort((a, b) => new Date(a.datum) - new Date(b.datum));
+            
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            
+            if (trendChart) {
+                trendChart.destroy();
+            }
+            
+            const norm = getNorm(paramCode);
+            const paramInfo = parameterCatalog[paramCode] || {};
+            
+            const datasets = [
+                {
+                    label: paramInfo.naam || paramCode,
+                    data: sortedData.map(d => d.waarde),
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                }
+            ];
+            
+            if (norm) {
+                datasets.push({
+                    label: 'Norm',
+                    data: sortedData.map(() => norm),
+                    borderColor: '#ef4444',
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    fill: false
+                });
+            }
+            
+            trendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: sortedData.map(d => d.datum),
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#94a3b8' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#94a3b8', maxTicksLimit: 8 },
+                            grid: { color: '#334155' }
+                        },
+                        y: {
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: '#334155' },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateParamsTable(feature) {
+            const props = feature.properties;
+            const stats = props.parameter_stats || {};
+            
+            const sorted = Object.entries(stats)
+                .filter(([code, s]) => s.aantal > 0)
+                .sort((a, b) => b[1].aantal - a[1].aantal);
+            
+            const tbody = document.getElementById('paramsTableBody');
+            tbody.innerHTML = sorted.map(([code, s]) => {
+                const info = parameterCatalog[code] || {};
+                return `
+                    <tr onclick="selectParameter('${code}')" style="cursor: pointer;">
+                        <td>
+                            <strong>${code}</strong><br>
+                            <small style="color: var(--text-secondary);">${info.naam || ''}</small>
+                        </td>
+                        <td>${s.gemiddelde.toFixed(3)}</td>
+                        <td>${s.maximum.toFixed(3)}</td>
+                        <td>${s.aantal}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function closeDetailPanel() {
+            document.getElementById('detailPanel').classList.remove('active');
+            selectedFeature = null;
+        }
+        
+        function showLoading(show) {
+            document.getElementById('loadingOverlay').classList.toggle('active', show);
+        }
+        
+        function downloadCombinedGeoJSON() {
+            if (combinedFeatures.length === 0) {
+                alert('Geen data geladen');
+                return;
+            }
+            
+            // Maak gecombineerde GeoJSON
+            const combined = {
+                type: 'FeatureCollection',
+                metadata: {
+                    waterbeheerders: Object.keys(loadedDatasets).filter(k => loadedDatasets[k].visible),
+                    gegenereerd: new Date().toISOString(),
+                    bron: 'WKP Viewer - Gecombineerde export'
+                },
+                parameters: parameterCatalog,
+                features: combinedFeatures.map(f => {
+                    // Verwijder interne properties
+                    const cleanProps = { ...f.properties };
+                    delete cleanProps._datasetName;
+                    delete cleanProps._datasetColor;
+                    return {
+                        type: 'Feature',
+                        geometry: f.geometry,
+                        properties: cleanProps
+                    };
+                })
+            };
+            
+            const dataStr = JSON.stringify(combined, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `wkp_gecombineerd_${new Date().toISOString().split('T')[0]}.geojson`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        function exportData() {
+            if (!selectedFeature) {
+                alert('Selecteer eerst een meetpunt door erop te klikken');
+                return;
+            }
+            
+            const props = selectedFeature.properties;
+            const stats = props.parameter_stats || {};
+            const tijdreeksen = props.tijdreeksen || {};
+            
+            // Maak een workbook met meerdere sheets
+            const wb = XLSX.utils.book_new();
+            
+            // Sheet 1: Meetpunt informatie
+            const meetpuntInfo = [{
+                'Code': props.code,
+                'Omschrijving': props.omschrijving,
+                'Waterschap': props.waterschap || props._datasetName,
+                'X_RD': props.x_rd,
+                'Y_RD': props.y_rd,
+                'KRW Watertype': props.krw_watertype,
+                'Jaren': (props.jaren || []).join(', ')
+            }];
+            const wsInfo = XLSX.utils.json_to_sheet(meetpuntInfo);
+            XLSX.utils.book_append_sheet(wb, wsInfo, 'Meetpunt Info');
+            
+            // Sheet 2: Parameter statistieken
+            const paramStats = Object.entries(stats).map(([code, s]) => {
+                const info = parameterCatalog[code] || {};
+                return {
+                    'Parameter': code,
+                    'Naam': info.naam || '',
+                    'Eenheid': info.eenheid || '',
+                    'Categorie': info.categorie || '',
+                    'Gemiddelde': s.gemiddelde || 0,
+                    'Maximum': s.maximum || 0,
+                    'Minimum': s.minimum || 0,
+                    'Aantal': s.aantal || 0
+                };
+            });
+            const wsStats = XLSX.utils.json_to_sheet(paramStats);
+            XLSX.utils.book_append_sheet(wb, wsStats, 'Parameter Statistieken');
+            
+            // Sheet 3: Tijdreeks van geselecteerde parameter
+            const tijdreeks = tijdreeksen[currentParameter] || [];
+            if (tijdreeks.length > 0) {
+                const paramInfo = parameterCatalog[currentParameter] || {};
+                const tsData = tijdreeks.map(m => ({
+                    'Datum': m.datum,
+                    'Jaar': m.jaar,
+                    'Waarde': m.waarde,
+                    'Eenheid': paramInfo.eenheid || ''
+                }));
+                const wsTijdreeks = XLSX.utils.json_to_sheet(tsData);
+                XLSX.utils.book_append_sheet(wb, wsTijdreeks, `Tijdreeks ${currentParameter}`);
+            }
+            
+            // Download
+            XLSX.writeFile(wb, `wkp_${props.code}_export.xlsx`);
+        }
+        
+        // ==================== GEBIEDSSELECTIE FUNCTIES ====================
+        
+        function initDrawControl() {
+            // Maak een layer group voor getekende items
+            drawnItems = new L.FeatureGroup();
+            map.addLayer(drawnItems);
+            
+            // Toon de toolbar als er data is geladen
+            document.getElementById('areaToolbar').style.display = 'flex';
+        }
+        
+        function startDrawArea(area) {
+            currentDrawArea = area;
+            
+            // Update button states
+            document.getElementById('btnAreaA').classList.toggle('active', area === 'A');
+            document.getElementById('btnAreaB').classList.toggle('active', area === 'B');
+            
+            // Verwijder bestaand gebied als we opnieuw tekenen
+            if (area === 'A' && areaA) {
+                drawnItems.removeLayer(areaA);
+                areaA = null;
+            } else if (area === 'B' && areaB) {
+                drawnItems.removeLayer(areaB);
+                areaB = null;
+            }
+            
+            // Start draw mode
+            const color = area === 'A' ? '#3b82f6' : '#f97316';
+            const drawer = new L.Draw.Rectangle(map, {
+                shapeOptions: {
+                    color: color,
+                    fillColor: color,
+                    fillOpacity: 0.2,
+                    weight: 2
+                }
+            });
+            drawer.enable();
+            
+            // Luister naar draw:created event
+            map.once('draw:created', function(e) {
+                const layer = e.layer;
+                drawnItems.addLayer(layer);
+                
+                if (currentDrawArea === 'A') {
+                    areaA = layer;
+                    document.getElementById('btnAreaA').innerHTML = '☑ Gebied A';
+                } else {
+                    areaB = layer;
+                    document.getElementById('btnAreaB').innerHTML = '☑ Gebied B';
+                }
+                
+                // Reset button states
+                document.getElementById('btnAreaA').classList.remove('active');
+                document.getElementById('btnAreaB').classList.remove('active');
+                currentDrawArea = null;
+                
+                // Update analyse
+                updateAreaAnalysis();
+            });
+        }
+        
+        function clearAreas() {
+            if (areaA) {
+                drawnItems.removeLayer(areaA);
+                areaA = null;
+            }
+            if (areaB) {
+                drawnItems.removeLayer(areaB);
+                areaB = null;
+            }
+            
+            areaAFeatures = [];
+            areaBFeatures = [];
+            
+            document.getElementById('btnAreaA').innerHTML = '☐ Gebied A';
+            document.getElementById('btnAreaB').innerHTML = '☐ Gebied B';
+            document.getElementById('btnAreaA').classList.remove('active');
+            document.getElementById('btnAreaB').classList.remove('active');
+            
+            document.getElementById('areaPanel').classList.remove('active');
+        }
+        
+        function updateAreaAnalysis() {
+            // Vind features in elk gebied
+            areaAFeatures = areaA ? getFeaturesInBounds(areaA.getBounds()) : [];
+            areaBFeatures = areaB ? getFeaturesInBounds(areaB.getBounds()) : [];
+            
+            if (areaAFeatures.length === 0 && areaBFeatures.length === 0) {
+                document.getElementById('areaPanel').classList.remove('active');
+                return;
+            }
+            
+            // Toon het analyse panel
+            document.getElementById('areaPanel').classList.add('active');
+            
+            // Update statistieken
+            updateAreaStats();
+            updateCompareChart();
+            updateHistograms();
+            updateMeetpuntenChart();
+        }
+        
+        function getFeaturesInBounds(bounds) {
+            return combinedFeatures.filter(f => {
+                const coords = f.geometry.coordinates;
+                const lat = coords[1];
+                const lng = coords[0];
+                return bounds.contains([lat, lng]);
+            });
+        }
+        
+        function updateAreaStats() {
+            const grid = document.getElementById('areaStatsGrid');
+            let html = '';
+            
+            // Gebied A stats
+            if (areaAFeatures.length > 0) {
+                const statsA = calculateAreaStats(areaAFeatures);
+                html += `
+                    <div class="area-stat-card area-a">
+                        <h4>Gebied A - Meetpunten</h4>
+                        <div class="value">${areaAFeatures.length}</div>
+                    </div>
+                    <div class="area-stat-card area-a">
+                        <h4>Gebied A - Gemiddelde</h4>
+                        <div class="value">${statsA.gemiddelde.toFixed(3)}</div>
+                        <div class="sub">Min: ${statsA.min.toFixed(3)} | Max: ${statsA.max.toFixed(3)}</div>
+                    </div>
+                `;
+            }
+            
+            // Gebied B stats
+            if (areaBFeatures.length > 0) {
+                const statsB = calculateAreaStats(areaBFeatures);
+                html += `
+                    <div class="area-stat-card area-b">
+                        <h4>Gebied B - Meetpunten</h4>
+                        <div class="value">${areaBFeatures.length}</div>
+                    </div>
+                    <div class="area-stat-card area-b">
+                        <h4>Gebied B - Gemiddelde</h4>
+                        <div class="value">${statsB.gemiddelde.toFixed(3)}</div>
+                        <div class="sub">Min: ${statsB.min.toFixed(3)} | Max: ${statsB.max.toFixed(3)}</div>
+                    </div>
+                `;
+            }
+            
+            grid.innerHTML = html;
+        }
+        
+        function calculateAreaStats(features) {
+            let values = [];
+            
+            features.forEach(f => {
+                const stats = f.properties.parameter_stats || {};
+                if (stats[currentParameter]) {
+                    values.push(stats[currentParameter].gemiddelde);
+                }
+            });
+            
+            if (values.length === 0) {
+                return { gemiddelde: 0, min: 0, max: 0, std: 0, aantal: 0 };
+            }
+            
+            const sum = values.reduce((a, b) => a + b, 0);
+            const gemiddelde = sum / values.length;
+            const min = Math.min(...values);
+            const max = Math.max(...values);
+            const std = Math.sqrt(values.reduce((sq, n) => sq + Math.pow(n - gemiddelde, 2), 0) / values.length);
+            
+            return { gemiddelde, min, max, std, aantal: values.length };
+        }
+        
+        function updateCompareChart() {
+            const ctx = document.getElementById('compareChart').getContext('2d');
+            
+            if (compareChart) {
+                compareChart.destroy();
+            }
+            
+            const statsA = areaAFeatures.length > 0 ? calculateAreaStats(areaAFeatures) : null;
+            const statsB = areaBFeatures.length > 0 ? calculateAreaStats(areaBFeatures) : null;
+            
+            const labels = [];
+            const dataA = [];
+            const dataB = [];
+            
+            if (statsA) {
+                labels.push('Gebied A');
+                dataA.push(statsA.gemiddelde);
+                dataB.push(null);
+            }
+            if (statsB) {
+                if (statsA) {
+                    dataA[dataA.length - 1] = statsA.gemiddelde;
+                    dataB[dataB.length - 1] = statsB.gemiddelde;
+                } else {
+                    labels.push('Gebied B');
+                    dataA.push(null);
+                    dataB.push(statsB.gemiddelde);
+                }
+            }
+            
+            compareChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Gemiddelde ' + currentParameter],
+                    datasets: [
+                        {
+                            label: 'Gebied A',
+                            data: [statsA ? statsA.gemiddelde : 0],
+                            backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                            borderColor: '#3b82f6',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Gebied B',
+                            data: [statsB ? statsB.gemiddelde : 0],
+                            backgroundColor: 'rgba(249, 115, 22, 0.7)',
+                            borderColor: '#f97316',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#94a3b8' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: '#334155' }
+                        },
+                        y: {
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: '#334155' },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateHistograms() {
+            updateHistogram('A', areaAFeatures, 'histogramA');
+            updateHistogram('B', areaBFeatures, 'histogramB');
+        }
+        
+        function updateHistogram(area, features, canvasId) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            
+            if (area === 'A' && histogramAChart) histogramAChart.destroy();
+            if (area === 'B' && histogramBChart) histogramBChart.destroy();
+            
+            // Verzamel alle waarden binnen het jaar bereik
+            let values = [];
+            features.forEach(f => {
+                const tijdreeksen = f.properties.tijdreeksen || {};
+                const reeks = tijdreeksen[currentParameter] || [];
+                reeks.forEach(m => {
+                    if (m.jaar >= yearRangeMin && m.jaar <= yearRangeMax) {
+                        values.push(m.waarde);
+                    }
+                });
+            });
+            
+            if (values.length === 0) {
+                return;
+            }
+            
+            // Maak histogram bins
+            const min = Math.min(...values);
+            const max = Math.max(...values);
+            const binCount = 15;
+            const binWidth = (max - min) / binCount || 1;
+            const bins = new Array(binCount).fill(0);
+            const binLabels = [];
+            
+            for (let i = 0; i < binCount; i++) {
+                const binStart = min + i * binWidth;
+                binLabels.push(binStart.toFixed(2));
+            }
+            
+            values.forEach(v => {
+                const binIndex = Math.min(Math.floor((v - min) / binWidth), binCount - 1);
+                bins[binIndex]++;
+            });
+            
+            const color = area === 'A' ? 'rgba(59, 130, 246, 0.7)' : 'rgba(249, 115, 22, 0.7)';
+            const borderColor = area === 'A' ? '#3b82f6' : '#f97316';
+            
+            const chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: binLabels,
+                    datasets: [{
+                        label: `Frequentie (n=${values.length})`,
+                        data: bins,
+                        backgroundColor: color,
+                        borderColor: borderColor,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#94a3b8' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#94a3b8', maxTicksLimit: 8 },
+                            grid: { color: '#334155' }
+                        },
+                        y: {
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: '#334155' },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            if (area === 'A') histogramAChart = chart;
+            else histogramBChart = chart;
+        }
+        
+        function updateMeetpuntenChart() {
+            const ctx = document.getElementById('meetpuntenChart').getContext('2d');
+            
+            if (meetpuntenChart) {
+                meetpuntenChart.destroy();
+            }
+            
+            // Combineer features van beide gebieden
+            const allFeatures = [...areaAFeatures, ...areaBFeatures];
+            if (allFeatures.length === 0) return;
+            
+            // Beperk tot max 10 meetpunten voor leesbaarheid
+            const features = allFeatures.slice(0, 10);
+            
+            // Kleuren voor meetpunten
+            const meetpuntColors = [
+                '#3b82f6', '#22c55e', '#f97316', '#a855f7', '#06b6d4',
+                '#ec4899', '#eab308', '#14b8a6', '#8b5cf6', '#f43f5e'
+            ];
+            
+            const datasets = [];
+            const legendHtml = [];
+            
+            features.forEach((f, idx) => {
+                const tijdreeksen = f.properties.tijdreeksen || {};
+                const reeks = tijdreeksen[currentParameter] || [];
+                const sortedReeks = [...reeks].sort((a, b) => new Date(a.datum) - new Date(b.datum));
+                
+                const color = meetpuntColors[idx % meetpuntColors.length];
+                const code = f.properties.code || `Meetpunt ${idx + 1}`;
+                
+                datasets.push({
+                    label: code,
+                    data: sortedReeks.map(m => ({ x: m.datum, y: m.waarde })),
+                    borderColor: color,
+                    backgroundColor: color,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    showLine: false  // Alleen punten, geen lijnen
+                });
+                
+                legendHtml.push(`
+                    <div class="meetpunt-legend-item">
+                        <div class="meetpunt-color" style="background: ${color}"></div>
+                        <span>${code}</span>
+                    </div>
+                `);
+            });
+            
+            document.getElementById('meetpuntenLegend').innerHTML = legendHtml.join('');
+            
+            meetpuntenChart = new Chart(ctx, {
+                type: 'scatter',
+                data: { datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'category',
+                            labels: datasets[0]?.data.map(d => d.x) || [],
+                            ticks: { color: '#94a3b8', maxTicksLimit: 8 },
+                            grid: { color: '#334155' }
+                        },
+                        y: {
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: '#334155' },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        function switchAreaTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.area-panel-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.tab === tabName);
+            });
+            
+            // Update tab content
+            document.getElementById('tabStats').style.display = tabName === 'stats' ? 'block' : 'none';
+            document.getElementById('tabHistogram').style.display = tabName === 'histogram' ? 'block' : 'none';
+            document.getElementById('tabMeetpunten').style.display = tabName === 'meetpunten' ? 'block' : 'none';
+        }
+        
+        function closeAreaPanel() {
+            document.getElementById('areaPanel').classList.remove('active');
+        }
+        
+        // Year slider event listeners
+        document.getElementById('yearSliderMin').addEventListener('input', function() {
+            yearRangeMin = parseInt(this.value);
+            if (yearRangeMin > yearRangeMax) {
+                yearRangeMin = yearRangeMax;
+                this.value = yearRangeMin;
+            }
+            document.getElementById('yearRangeStart').textContent = yearRangeMin;
+            updateHistograms();
+        });
+        
+        document.getElementById('yearSliderMax').addEventListener('input', function() {
+            yearRangeMax = parseInt(this.value);
+            if (yearRangeMax < yearRangeMin) {
+                yearRangeMax = yearRangeMin;
+                this.value = yearRangeMax;
+            }
+            document.getElementById('yearRangeEnd').textContent = yearRangeMax;
+            updateHistograms();
+        });
+        
+        function updateYearSliders() {
+            // Verzamel alle jaren uit de geladen datasets
+            let allYears = new Set();
+            Object.values(loadedDatasets).forEach(dataset => {
+                if (dataset.data.metadata && dataset.data.metadata.jaren) {
+                    dataset.data.metadata.jaren.forEach(y => allYears.add(y));
+                }
+            });
+            
+            if (allYears.size === 0) return;
+            
+            const years = Array.from(allYears).sort((a, b) => a - b);
+            const minYear = years[0];
+            const maxYear = years[years.length - 1];
+            
+            // Update sliders
+            const sliderMin = document.getElementById('yearSliderMin');
+            const sliderMax = document.getElementById('yearSliderMax');
+            
+            sliderMin.min = minYear;
+            sliderMin.max = maxYear;
+            sliderMin.value = minYear;
+            
+            sliderMax.min = minYear;
+            sliderMax.max = maxYear;
+            sliderMax.value = maxYear;
+            
+            yearRangeMin = minYear;
+            yearRangeMax = maxYear;
+            
+            document.getElementById('yearRangeStart').textContent = minYear;
+            document.getElementById('yearRangeEnd').textContent = maxYear;
+        }
+        
+        // ===== SEIZOENSGRAFIEKEN FUNCTIES =====
+        
+        function updateSeasonCharts(feature, paramCode) {
+            if (!feature) return;
+            
+            const props = feature.properties;
+            const tijdreeksen = props.tijdreeksen || {};
+            const tijdreeks = tijdreeksen[paramCode] || [];
+            
+            if (tijdreeks.length === 0) {
+                // Geen data, toon lege grafieken
+                clearSeasonCharts();
+                return;
+            }
+            
+            // Update beide grafieken
+            updateMonthlyChart(tijdreeks, paramCode);
+            updateSeasonBoxChart(tijdreeks, paramCode);
+        }
+        
+        function clearSeasonCharts() {
+            if (monthlyChart) {
+                monthlyChart.destroy();
+                monthlyChart = null;
+            }
+            if (seasonBoxChart) {
+                seasonBoxChart.destroy();
+                seasonBoxChart = null;
+            }
+        }
+        
+        function updateMonthlyChart(tijdreeks, paramCode) {
+            const ctx = document.getElementById('monthlyChart').getContext('2d');
+            
+            if (monthlyChart) {
+                monthlyChart.destroy();
+            }
+            
+            // Groepeer data per maand
+            const monthlyData = {};
+            for (let i = 1; i <= 12; i++) {
+                monthlyData[i] = [];
+            }
+            
+            tijdreeks.forEach(m => {
+                const date = new Date(m.datum);
+                const month = date.getMonth() + 1; // 1-12
+                if (m.waarde !== null && m.waarde !== undefined) {
+                    monthlyData[month].push(m.waarde);
+                }
+            });
+            
+            // Bereken gemiddelden per maand
+            const monthNames = ['Jan', 'Feb', 'Mrt', 'Apr', 'Mei', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec'];
+            const averages = [];
+            const counts = [];
+            
+            for (let i = 1; i <= 12; i++) {
+                const values = monthlyData[i];
+                if (values.length > 0) {
+                    const avg = values.reduce((a, b) => a + b, 0) / values.length;
+                    averages.push(avg);
+                    counts.push(values.length);
+                } else {
+                    averages.push(null);
+                    counts.push(0);
+                }
+            }
+            
+            const paramInfo = parameterCatalog[paramCode] || {};
+            const eenheid = paramInfo.eenheid || '';
+            
+            monthlyChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: monthNames,
+                    datasets: [{
+                        label: `Gemiddelde ${paramCode}`,
+                        data: averages,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#3b82f6'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const idx = context.dataIndex;
+                                    const value = context.raw;
+                                    const count = counts[idx];
+                                    if (value !== null) {
+                                        return `${value.toFixed(3)} ${eenheid} (n=${count})`;
+                                    }
+                                    return 'Geen data';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: '#334155' }
+                        },
+                        y: {
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: '#334155' },
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: eenheid,
+                                color: '#94a3b8'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateSeasonBoxChart(tijdreeks, paramCode) {
+            const ctx = document.getElementById('seasonBoxChart').getContext('2d');
+            
+            if (seasonBoxChart) {
+                seasonBoxChart.destroy();
+            }
+            
+            // Groepeer data per seizoen
+            const seasonData = {
+                'Lente': [],      // Maart, April, Mei (3, 4, 5)
+                'Zomer': [],      // Juni, Juli, Augustus (6, 7, 8)
+                'Herfst': [],     // September, Oktober, November (9, 10, 11)
+                'Winter': []      // December, Januari, Februari (12, 1, 2)
+            };
+            
+            tijdreeks.forEach(m => {
+                const date = new Date(m.datum);
+                const month = date.getMonth() + 1; // 1-12
+                
+                if (m.waarde !== null && m.waarde !== undefined) {
+                    if (month >= 3 && month <= 5) {
+                        seasonData['Lente'].push(m.waarde);
+                    } else if (month >= 6 && month <= 8) {
+                        seasonData['Zomer'].push(m.waarde);
+                    } else if (month >= 9 && month <= 11) {
+                        seasonData['Herfst'].push(m.waarde);
+                    } else {
+                        seasonData['Winter'].push(m.waarde);
+                    }
+                }
+            });
+            
+            // Bereken box plot statistieken per seizoen
+            const seasons = ['Lente', 'Zomer', 'Herfst', 'Winter'];
+            const seasonColors = ['#22c55e', '#eab308', '#f97316', '#3b82f6'];
+            
+            const boxData = seasons.map((season, idx) => {
+                const values = seasonData[season].sort((a, b) => a - b);
+                if (values.length === 0) {
+                    return { season, min: null, q1: null, median: null, q3: null, max: null, color: seasonColors[idx], count: 0 };
+                }
+                
+                const min = values[0];
+                const max = values[values.length - 1];
+                const median = getPercentile(values, 50);
+                const q1 = getPercentile(values, 25);
+                const q3 = getPercentile(values, 75);
+                
+                return { season, min, q1, median, q3, max, color: seasonColors[idx], count: values.length };
+            });
+            
+            const paramInfo = parameterCatalog[paramCode] || {};
+            const eenheid = paramInfo.eenheid || '';
+            
+            // Maak een aangepaste box plot met bar chart
+            // We gebruiken floating bars voor de box (Q1-Q3) en error bars voor whiskers
+            seasonBoxChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: seasons,
+                    datasets: [
+                        // Whisker bottom (min to Q1)
+                        {
+                            label: 'Min-Q1',
+                            data: boxData.map(d => d.min !== null ? [d.min, d.q1] : null),
+                            backgroundColor: boxData.map(d => d.color + '40'),
+                            borderColor: boxData.map(d => d.color),
+                            borderWidth: 1,
+                            barPercentage: 0.3
+                        },
+                        // Box (Q1 to Q3)
+                        {
+                            label: 'Q1-Q3 (IQR)',
+                            data: boxData.map(d => d.q1 !== null ? [d.q1, d.q3] : null),
+                            backgroundColor: boxData.map(d => d.color + '80'),
+                            borderColor: boxData.map(d => d.color),
+                            borderWidth: 2,
+                            barPercentage: 0.6
+                        },
+                        // Whisker top (Q3 to max)
+                        {
+                            label: 'Q3-Max',
+                            data: boxData.map(d => d.q3 !== null ? [d.q3, d.max] : null),
+                            backgroundColor: boxData.map(d => d.color + '40'),
+                            borderColor: boxData.map(d => d.color),
+                            borderWidth: 1,
+                            barPercentage: 0.3
+                        },
+                        // Median line (als scatter punten)
+                        {
+                            label: 'Mediaan',
+                            data: boxData.map(d => d.median),
+                            type: 'scatter',
+                            pointRadius: 6,
+                            pointStyle: 'line',
+                            rotation: 90,
+                            borderColor: '#ffffff',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#ffffff'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const idx = context.dataIndex;
+                                    const d = boxData[idx];
+                                    if (d.count === 0) return 'Geen data';
+                                    return [
+                                        `Mediaan: ${d.median?.toFixed(3)} ${eenheid}`,
+                                        `Q1-Q3: ${d.q1?.toFixed(3)} - ${d.q3?.toFixed(3)}`,
+                                        `Min-Max: ${d.min?.toFixed(3)} - ${d.max?.toFixed(3)}`,
+                                        `Aantal: ${d.count}`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: false,
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: '#334155' }
+                        },
+                        y: {
+                            stacked: false,
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: '#334155' },
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: eenheid,
+                                color: '#94a3b8'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Helper functie voor percentiel berekening
+        function getPercentile(sortedArr, percentile) {
+            if (sortedArr.length === 0) return null;
+            if (sortedArr.length === 1) return sortedArr[0];
+            
+            const index = (percentile / 100) * (sortedArr.length - 1);
+            const lower = Math.floor(index);
+            const upper = Math.ceil(index);
+            const weight = index - lower;
+            
+            if (upper >= sortedArr.length) return sortedArr[sortedArr.length - 1];
+            return sortedArr[lower] * (1 - weight) + sortedArr[upper] * weight;
+        }
+    </script>
+</body>
+</html>

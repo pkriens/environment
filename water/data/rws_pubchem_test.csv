@@ -1,0 +1,11 @@
+rwscode,dutch_name,iupac_name,pubchem_cid,molecular_formula,molecular_weight,pubchem_iupac_name,smiles,inchikey,inchi
+1112T4ClC2a,"1,1,1,2-tetrachloorethaan","1,1,1,2-tetrachloroethane",12418,C2H2Cl4,167.8,"1,1,1,2-tetrachloroethane",C(C(Cl)(Cl)Cl)Cl,QVLAWKAXOMEXPM-UHFFFAOYSA-N,"InChI=1S/C2H2Cl4/c3-1-2(4,5)6/h1H2"
+111TClC2a,"1,1,1-trichloorethaan","1,1,1-trichloroethane",6278,C2H3Cl3,133.40,"1,1,1-trichloroethane",CC(Cl)(Cl)Cl,UOCLXMDMGBRAIB-UHFFFAOYSA-N,"InChI=1S/C2H3Cl3/c1-2(3,4)5/h1H3"
+1122T4ClC2a,"1,1,2,2-tetrachloorethaan","1,1,2,2-tetrachloroethane",6591,C2H2Cl4,167.8,"1,1,2,2-tetrachloroethane",C(C(Cl)Cl)(Cl)Cl,QPFMBZIOSGYJDE-UHFFFAOYSA-N,InChI=1S/C2H2Cl4/c3-1(4)2(5)6/h1-2H
+112TClC2a,"1,1,2-trichloorethaan","1,1,2-trichloroethane",6574,C2H3Cl3,133.40,"1,1,2-trichloroethane",C(C(Cl)Cl)Cl,UBOXGVDOUJQMTN-UHFFFAOYSA-N,"InChI=1S/C2H3Cl3/c3-1-2(4)5/h2H,1H2"
+11ClPF3OUdS,11-chlooreicosafluor-3-oxaundecaan-1-sulfonzuur,11-chloroeicosafluoro-3-oxaundecan-1-sulfonic acid,,,,,,,
+11DClC2a,"1,1-dichloorethaan","1,1-dichloroethane",6365,C2H4Cl2,98.96,"1,1-dichloroethane",CC(Cl)Cl,SCYULBFZEHDVBN-UHFFFAOYSA-N,"InChI=1S/C2H4Cl2/c1-2(3)4/h2H,1H3"
+11DClC2e,"1,1-dichlooretheen","1,1-dichloroethene",6366,C2H2Cl2,96.94,"1,1-dichloroethene",C=C(Cl)Cl,LGXVIGDEPROXKC-UHFFFAOYSA-N,InChI=1S/C2H2Cl2/c1-2(3)4/h1H2
+11DClC3a,"1,1-dichloorpropaan","1,1-dichloropropane",6573,C3H6Cl2,112.98,"1,1-dichloropropane",CCC(Cl)Cl,WIHMGGWNMISDNJ-UHFFFAOYSA-N,"InChI=1S/C3H6Cl2/c1-2-3(4)5/h3H,2H2,1H3"
+11DClC3e,"1,1-dichloorpropeen","1,1-dichloropropene",11245,C3H4Cl2,110.97,"1,1-dichloroprop-1-ene",CC=C(Cl)Cl,ZAIDIVBQUMFXEC-UHFFFAOYSA-N,"InChI=1S/C3H4Cl2/c1-2-3(4)5/h2H,1H3"
+1234T4C1yBen,"1,2,3,4-tetramethylbenzeen","1,2,3,4-tetramethylbenzene",10263,C10H14,134.22,"1,2,3,4-tetramethylbenzene",CC1=C(C(=C(C=C1)C)C)C,UOHMMEJUHBCKEE-UHFFFAOYSA-N,"InChI=1S/C10H14/c1-7-5-6-8(2)10(4)9(7)3/h5-6H,1-4H3"
